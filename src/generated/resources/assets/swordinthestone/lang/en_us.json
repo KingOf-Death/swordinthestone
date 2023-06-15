@@ -1,0 +1,18 @@
+{
+  "ability.swordinthestone.thunder_smite": "Thunder Smite",
+  "ability.swordinthestone.thunder_smite.description": "Sword charges when attacking mobs\nStrikes mobs with lightning when fully charged",
+  "ability.swordinthestone.thunder_smite.title": "Thundering %1$s",
+  "ability.swordinthestone.toxic_dash": "Toxic Dash",
+  "ability.swordinthestone.toxic_dash.description": "Slash forward on right click leaving behind a poisonous cloud",
+  "ability.swordinthestone.toxic_dash.title": "Toxic %1$s",
+  "ability.swordinthestone.vampiric": "Life Steal",
+  "ability.swordinthestone.vampiric.description": "Gain 0-2 hearts upon killing a mob",
+  "ability.swordinthestone.vampiric.title": "Vampiric %1$s",
+  "item.swordinthestone.desert_sword": "Sword of the Desert",
+  "item.swordinthestone.forest_sword": "Sword of the Forest",
+  "item_group.swordinthestone.swords": "Unique Swords",
+  "subtitles.swordinthestone.dash": "Dash attack",
+  "subtitles.swordinthestone.heal": "Vampiric healing",
+  "subtitles.swordinthestone.toxic": "Toxins released",
+  "subtitles.swordinthestone.zap": "Electric zap"
+}

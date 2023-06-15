@@ -1,0 +1,35 @@
+{
+  "dash": {
+    "sounds": [
+      "swordinthestone:dash1",
+      "swordinthestone:dash2",
+      "swordinthestone:dash3",
+      "swordinthestone:dash4"
+    ],
+    "subtitle": "subtitles.swordinthestone.dash"
+  },
+  "heal": {
+    "sounds": [
+      "swordinthestone:heal1",
+      "swordinthestone:heal2",
+      "swordinthestone:heal3",
+      "swordinthestone:heal4",
+      "swordinthestone:heal5"
+    ],
+    "subtitle": "subtitles.swordinthestone.heal"
+  },
+  "toxic": {
+    "sounds": [
+      "swordinthestone:toxic"
+    ],
+    "subtitle": "subtitles.swordinthestone.toxic"
+  },
+  "zap": {
+    "sounds": [
+      "swordinthestone:zap1",
+      "swordinthestone:zap2",
+      "swordinthestone:zap3"
+    ],
+    "subtitle": "subtitles.swordinthestone.zap"
+  }
+}

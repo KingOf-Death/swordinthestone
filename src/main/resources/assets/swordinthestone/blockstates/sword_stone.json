@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "swordinthestone:block/sword_stone",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "swordinthestone:block/sword_stone"
+    },
+    "facing=south": {
+      "model": "swordinthestone:block/sword_stone",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "swordinthestone:block/sword_stone",
+      "y": 270
+    }
+  }
+}
