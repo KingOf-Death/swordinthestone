@@ -1,7 +1,6 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/cobblestone",
 		"particle": "block/cobblestone"
 	},
 	"elements": [

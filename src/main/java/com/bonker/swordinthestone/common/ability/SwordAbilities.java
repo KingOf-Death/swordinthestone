@@ -1,7 +1,8 @@
 package com.bonker.swordinthestone.common.ability;
 
+import com.bonker.swordinthestone.util.AbilityUtil;
+import com.bonker.swordinthestone.util.MathUtil;
 import com.bonker.swordinthestone.SwordInTheStone;
-import com.bonker.swordinthestone.Util;
 import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.client.renderer.SSBEWLR;
 import com.bonker.swordinthestone.common.SSSounds;
@@ -85,9 +86,9 @@ public class SwordAbilities {
 
                         Vec3 delta;
                         if (player.isUnderWater()) {
-                            delta = Util.calculateViewVector(player.getXRot(), player.getYRot()).multiply(2, 2, 2);
+                            delta = MathUtil.calculateViewVector(player.getXRot(), player.getYRot()).multiply(2, 2, 2);
                         } else {
-                            delta = Util.calculateViewVector(Math.min(0, player.getXRot()), player.getYRot()).multiply(3, 1.2, 3);
+                            delta = MathUtil.calculateViewVector(Math.min(0, player.getXRot()), player.getYRot()).multiply(3, 1.2, 3);
                         }
 
                         player.push(delta.x, delta.y, delta.z);

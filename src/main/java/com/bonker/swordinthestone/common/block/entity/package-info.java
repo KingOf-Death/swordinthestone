@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package com.bonker.swordinthestone.common.block.blockentity;
+package com.bonker.swordinthestone.common.block.entity;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

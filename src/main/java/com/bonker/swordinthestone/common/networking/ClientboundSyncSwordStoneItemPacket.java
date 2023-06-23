@@ -1,6 +1,6 @@
 package com.bonker.swordinthestone.common.networking;
 
-import com.bonker.swordinthestone.common.block.blockentity.SSBlockEntities;
+import com.bonker.swordinthestone.common.block.entity.SSBlockEntities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;

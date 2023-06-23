@@ -1,9 +1,10 @@
 package com.bonker.swordinthestone.common.block;
 
-import com.bonker.swordinthestone.common.block.blockentity.SSBlockEntities;
-import com.bonker.swordinthestone.common.block.blockentity.SwordStoneBlockEntity;
+import com.bonker.swordinthestone.common.block.entity.SSBlockEntities;
+import com.bonker.swordinthestone.common.block.entity.SwordStoneBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -31,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 public class SwordStoneBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty HAS_SWORD = BooleanProperty.create("has_sword");
+    public static final EnumProperty<Variant> VARIANT = EnumProperty.create("variant", Variant.class);
     private static final VoxelShape BASE = Block.box(0, 0, 0, 16, 9, 16);
     private static final VoxelShape MIDDLE_0 = Block.box(4, 9, 4, 16, 15, 16);
     private static final VoxelShape TOP_0 = Block.box(12, 15, 12, 16, 16, 16);
@@ -68,7 +71,7 @@ public class SwordStoneBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FACING, HAS_SWORD);
+        pBuilder.add(FACING, HAS_SWORD, VARIANT);
     }
 
     @Override
@@ -101,5 +104,26 @@ public class SwordStoneBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
         return createTickerHelper(pBlockEntityType, SSBlockEntities.SWORD_STONE.get(), SwordStoneBlockEntity::tick);
+    }
+
+    public enum Variant implements StringRepresentable {
+        COBBLESTONE("cobblestone"),
+        SANDSTONE("sandstone");
+
+        private final String name;
+
+        Variant(String pName) {
+            this.name = pName;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return this.name;
+        }
     }
 }

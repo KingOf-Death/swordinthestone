@@ -19,11 +19,12 @@ public class SSDatagen {
 
         SSLanguageProvider languageProvider = new SSLanguageProvider(packOutput, MODID, "en_us");
         SSAnimatedTextureProvider animatedTextureProvider = new SSAnimatedTextureProvider(packOutput, MODID);
+        SSBlockStateProvider blockStateProvider = new SSBlockStateProvider(packOutput, MODID, existingFileHelper);
 
-        generator.addProvider(true, new SSItemModelProvider(packOutput, MODID, existingFileHelper, languageProvider, animatedTextureProvider));
+        generator.addProvider(true, new SSItemModelProvider(packOutput, MODID, existingFileHelper, languageProvider, animatedTextureProvider, blockStateProvider));
         generator.addProvider(true, new SSSoundProvider(packOutput, MODID, existingFileHelper, languageProvider));
         generator.addProvider(true, languageProvider);
         generator.addProvider(true, animatedTextureProvider);
-        generator.addProvider(true, new SSBlockStateProvider(packOutput, MODID, existingFileHelper));
+        generator.addProvider(true, blockStateProvider);
     }
 }

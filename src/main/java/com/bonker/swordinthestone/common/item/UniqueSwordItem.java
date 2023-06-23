@@ -1,9 +1,10 @@
 package com.bonker.swordinthestone.common.item;
 
 import com.bonker.swordinthestone.client.renderer.SSBEWLR;
-import com.bonker.swordinthestone.common.ability.AbilityUtil;
+import com.bonker.swordinthestone.util.AbilityUtil;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
+import com.bonker.swordinthestone.util.Color;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -37,7 +38,7 @@ import java.util.function.Consumer;
 public class UniqueSwordItem extends SwordItem {
     @SuppressWarnings("all") // suppress passing null for @NotNull tag
     public static final Tier TIER = new ForgeTier(0, 0, 0, 0, 10, null, () -> Ingredient.EMPTY);
-    public static final HashBasedTable<UniqueSwordItem, SwordAbility, Style> STYLE_TABLE = HashBasedTable.create();
+    public static final HashBasedTable<UniqueSwordItem, SwordAbility, Color> STYLE_TABLE = HashBasedTable.create();
     private static final int BASE_DAMAGE = 7;
     private static final float BASE_SPEED = 1.2F - 4F;
     public static final String DAMAGE_TAG = "damage";
@@ -145,8 +146,8 @@ public class UniqueSwordItem extends SwordItem {
     public Component getName(ItemStack pStack) {
         SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
         if (ability == SwordAbility.NONE) return super.getName(pStack);
-        Style style = STYLE_TABLE.get(this, ability);
-        return Component.translatable(ability.getTitleKey(), super.getName(pStack)).withStyle(style == null ? Style.EMPTY : style);
+        Color color = STYLE_TABLE.get(this, ability);
+        return Component.translatable(ability.getTitleKey(), super.getName(pStack)).withStyle(color == null ? Style.EMPTY : color.getStyle());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.bonker.swordinthestone.common.block.blockentity;
+package com.bonker.swordinthestone.common.block.entity;
 
 import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.block.SSBlocks;

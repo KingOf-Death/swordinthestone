@@ -4,7 +4,7 @@ import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.common.SSSounds;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.block.SSBlocks;
-import com.bonker.swordinthestone.common.block.blockentity.SSBlockEntities;
+import com.bonker.swordinthestone.common.block.entity.SSBlockEntities;
 import com.bonker.swordinthestone.common.entity.SSEntityTypes;
 import com.bonker.swordinthestone.common.item.SSItems;
 import com.bonker.swordinthestone.common.networking.SSNetworking;

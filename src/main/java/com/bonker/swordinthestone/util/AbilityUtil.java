@@ -1,5 +1,7 @@
-package com.bonker.swordinthestone.common.ability;
+package com.bonker.swordinthestone.util;
 
+import com.bonker.swordinthestone.common.ability.SwordAbilities;
+import com.bonker.swordinthestone.common.ability.SwordAbility;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;

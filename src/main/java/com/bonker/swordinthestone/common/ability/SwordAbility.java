@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.ability;
 
+import com.bonker.swordinthestone.util.MathUtil;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +17,7 @@ public abstract class SwordAbility {
 
     private final int color;
     private final Style colorStyle;
+    private final float[] diffusedColor;
 
     private String nameKey;
     private String titleKey;
@@ -24,6 +26,7 @@ public abstract class SwordAbility {
     public SwordAbility(int color) {
         this.color = color;
         this.colorStyle = Style.EMPTY.withColor(color);
+        this.diffusedColor = MathUtil.diffuseColor(color);
     }
 
     public int getColor() {
@@ -32,6 +35,10 @@ public abstract class SwordAbility {
 
     public Style getColorStyle() {
         return colorStyle;
+    }
+
+    public float[] getDiffusedColor() {
+        return diffusedColor;
     }
 
     public void hit(ServerLevel level, LivingEntity holder, LivingEntity victim) {}

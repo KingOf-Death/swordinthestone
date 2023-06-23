@@ -3,12 +3,16 @@
     {
       "structure": "swordinthestone:sword_stone_plains",
       "weight": 1
+    },
+    {
+      "structure": "swordinthestone:sword_stone_desert",
+      "weight": 1
     }
   ],
   "placement": {
     "type": "minecraft:random_spread",
-    "spacing": 100,
-    "separation": 50,
+    "spacing": 20,
+    "separation": 10,
     "salt": 1446207470
   }
 }

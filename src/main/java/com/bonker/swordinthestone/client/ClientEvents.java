@@ -6,7 +6,7 @@ import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.client.renderer.SSBEWLR;
 import com.bonker.swordinthestone.client.renderer.SwordStoneBlockEntityRenderer;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
-import com.bonker.swordinthestone.common.block.blockentity.SSBlockEntities;
+import com.bonker.swordinthestone.common.block.entity.SSBlockEntities;
 import com.bonker.swordinthestone.common.entity.SSEntityTypes;
 import com.bonker.swordinthestone.common.item.SSItems;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;

@@ -1,7 +1,8 @@
 package com.bonker.swordinthestone.common;
 
 import com.bonker.swordinthestone.SwordInTheStone;
-import com.bonker.swordinthestone.Util;
+import com.bonker.swordinthestone.util.Color;
+import com.bonker.swordinthestone.util.MathUtil;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
 import com.bonker.swordinthestone.common.capability.DashCapability;
@@ -13,7 +14,6 @@ import com.bonker.swordinthestone.common.item.UniqueSwordItem;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
 import com.bonker.swordinthestone.common.networking.ServerboundDashAttackPacket;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -112,7 +112,7 @@ public class CommonEvents {
             for (RegistryObject<Item> itemObj : SSItems.ITEMS.getEntries()) {
                 if (itemObj.get() instanceof UniqueSwordItem uniqueSwordItem) {
                     for (RegistryObject<SwordAbility> abilityObj : SwordAbilities.SWORD_ABILITIES.getEntries()) {
-                        UniqueSwordItem.STYLE_TABLE.put(uniqueSwordItem, abilityObj.get(), Style.EMPTY.withColor(Util.mergeColors(abilityObj.get().getColor(), uniqueSwordItem.getColor())));
+                        UniqueSwordItem.STYLE_TABLE.put(uniqueSwordItem, abilityObj.get(), new Color(MathUtil.mergeColors(abilityObj.get().getColor(), uniqueSwordItem.getColor())));
                     }
                 }
             }
