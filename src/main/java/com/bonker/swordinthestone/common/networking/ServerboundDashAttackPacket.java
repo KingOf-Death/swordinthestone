@@ -2,6 +2,7 @@ package com.bonker.swordinthestone.common.networking;
 
 import com.bonker.swordinthestone.common.capability.DashCapability;
 import com.bonker.swordinthestone.common.capability.IDashCapability;
+import com.bonker.swordinthestone.common.entity.HeightAreaEffectCloud;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,14 +31,15 @@ public class ServerboundDashAttackPacket {
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         ServerPlayer player = contextSupplier.get().getSender();
         if (player == null) return;
-        Optional<IDashCapability> cap = player.getCapability(DashCapability.DASH_DATA).resolve();
+        Optional<IDashCapability> cap = player.getCapability(DashCapability.DASH).resolve();
         if (cap.isEmpty() || cap.get().getDashTicks() <= 0) return;
-        ServerLevel level = (ServerLevel) player.level();
+        ServerLevel level = player.serverLevel();
         Entity entity = level.getEntity(entityId);
         if (entity == null) return;
         if (player.distanceTo(entity) > player.getAttributeValue(ForgeMod.ENTITY_REACH.get()) * 2) return;
         player.attackStrengthTicker = 100;
         player.attack(entity);
         player.resetAttackStrengthTicker();
+        HeightAreaEffectCloud.createToxicDashCloud(player.level(), player, player.getX(), player.getY() - 0.5, player.getZ());
     }
 }

@@ -1,0 +1,22 @@
+{
+  "structures": [
+    {
+      "structure": "swordinthestone:sword_stone_wastes",
+      "weight": 1
+    },
+    {
+      "structure": "swordinthestone:sword_stone_crimson",
+      "weight": 1
+    },
+    {
+      "structure": "swordinthestone:sword_stone_warped",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 35,
+    "separation": 10,
+    "salt": 1446207470
+  }
+}

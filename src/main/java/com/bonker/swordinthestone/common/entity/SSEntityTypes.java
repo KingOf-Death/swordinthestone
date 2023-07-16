@@ -19,6 +19,21 @@ public class SSEntityTypes {
                     .clientTrackingRange(10)
                     .updateInterval(Integer.MAX_VALUE));
 
+    public static final RegistryObject<EntityType<EnderRift>> ENDER_RIFT = register("ender_rift",
+            EntityType.Builder.<EnderRift>of(EnderRift::new, MobCategory.MISC)
+                    .fireImmune()
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(6)
+                    .updateInterval(Integer.MAX_VALUE) // custom networking
+                    .noSave());
+
+    public static final RegistryObject<EntityType<SpellFireball>> SPELL_FIREBALL = register("spell_fireball",
+            EntityType.Builder.<SpellFireball>of(SpellFireball::new, MobCategory.MISC)
+                    .fireImmune()
+                    .sized(1.0F, 1.0F)
+                    .clientTrackingRange(4)
+                    .updateInterval(10));
+
     private static <T extends Entity> RegistryObject<EntityType<T>> register(String key, EntityType.Builder<T> builder) {
         return ENTITY_TYPES.register(key, () -> builder.build(key));
     }

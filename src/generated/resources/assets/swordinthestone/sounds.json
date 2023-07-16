@@ -8,6 +8,12 @@
     ],
     "subtitle": "subtitles.swordinthestone.dash"
   },
+  "fireball": {
+    "sounds": [
+      "swordinthestone:fireball"
+    ],
+    "subtitle": "subtitles.swordinthestone.fireball"
+  },
   "heal": {
     "sounds": [
       "swordinthestone:heal1",
@@ -17,6 +23,54 @@
       "swordinthestone:heal5"
     ],
     "subtitle": "subtitles.swordinthestone.heal"
+  },
+  "jump": {
+    "sounds": [
+      "swordinthestone:jump"
+    ],
+    "subtitle": "subtitles.swordinthestone.jump"
+  },
+  "land": {
+    "sounds": [
+      "swordinthestone:land"
+    ],
+    "subtitle": "subtitles.swordinthestone.land"
+  },
+  "laser": {
+    "sounds": [
+      "swordinthestone:laser"
+    ],
+    "subtitle": "subtitles.swordinthestone.laser"
+  },
+  "rift": {
+    "sounds": [
+      "swordinthestone:rift"
+    ],
+    "subtitle": "subtitles.swordinthestone.rift"
+  },
+  "rock": {
+    "sounds": [
+      "swordinthestone:rock1",
+      "swordinthestone:rock2",
+      "swordinthestone:rock3",
+      "swordinthestone:rock4",
+      "swordinthestone:rock5",
+      "swordinthestone:rock6",
+      "swordinthestone:rock7",
+      "swordinthestone:rock8"
+    ],
+    "subtitle": "subtitles.swordinthestone.rock"
+  },
+  "success": {
+    "sounds": [
+      "swordinthestone:success"
+    ],
+    "subtitle": "subtitles.swordinthestone.success"
+  },
+  "sword_pull": {
+    "sounds": [
+      "swordinthestone:sword_pull"
+    ]
   },
   "toxic": {
     "sounds": [

@@ -1,9 +1,10 @@
 package com.bonker.swordinthestone.common.block;
 
+import com.bonker.swordinthestone.common.block.entity.ISwordStoneBlockEntity;
 import com.bonker.swordinthestone.common.block.entity.SSBlockEntities;
-import com.bonker.swordinthestone.common.block.entity.SwordStoneBlockEntity;
+import com.bonker.swordinthestone.common.block.entity.SwordStoneDummyBlockEntity;
+import com.bonker.swordinthestone.common.block.entity.SwordStoneMasterBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("deprecation")
 public class SwordStoneBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final BooleanProperty HAS_SWORD = BooleanProperty.create("has_sword");
+    public static final BooleanProperty IS_DUMMY = BooleanProperty.create("is_dummy");
     public static final EnumProperty<Variant> VARIANT = EnumProperty.create("variant", Variant.class);
     private static final VoxelShape BASE = Block.box(0, 0, 0, 16, 9, 16);
     private static final VoxelShape MIDDLE_0 = Block.box(4, 9, 4, 16, 15, 16);
@@ -54,24 +55,21 @@ public class SwordStoneBlock extends BaseEntityBlock {
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        return switch (pState.getValue(FACING)) {
-            case NORTH -> interact(pLevel, pPos, pPlayer, pHand);
-            case EAST -> interact(pLevel, pPos.west(), pPlayer, pHand);
-            case SOUTH -> interact(pLevel, pPos.north().west(), pPlayer, pHand);
-            case WEST -> interact(pLevel, pPos.north(), pPlayer, pHand);
-            default -> InteractionResult.PASS;
-        };
+        return interact(pLevel, pPos, pPlayer, pHand);
     }
 
     private InteractionResult interact(Level level, BlockPos pos, Player player, InteractionHand usedHand) {
-        return level.getBlockEntity(pos, SSBlockEntities.SWORD_STONE.get())
-                .map(swordStoneBlockEntity -> swordStoneBlockEntity.interact(player, usedHand))
-                .orElse(InteractionResult.PASS);
+        BlockEntity entity = level.getBlockEntity(pos);
+        if (entity instanceof ISwordStoneBlockEntity) {
+            return ((ISwordStoneBlockEntity) entity).interact(player, usedHand);
+        } else {
+            return InteractionResult.PASS;
+        }
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FACING, HAS_SWORD, VARIANT);
+        pBuilder.add(FACING, VARIANT, IS_DUMMY);
     }
 
     @Override
@@ -97,18 +95,23 @@ public class SwordStoneBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return pState.getValue(FACING) == Direction.NORTH ? new SwordStoneBlockEntity(pPos, pState) : null;
+        return pState.getValue(IS_DUMMY) ? new SwordStoneDummyBlockEntity(pPos, pState) : new SwordStoneMasterBlockEntity(pPos, pState);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return createTickerHelper(pBlockEntityType, SSBlockEntities.SWORD_STONE.get(), SwordStoneBlockEntity::tick);
+        return pBlockEntityType == SSBlockEntities.SWORD_STONE_MASTER.get() ? createTickerHelper(pBlockEntityType, SSBlockEntities.SWORD_STONE_MASTER.get(), SwordStoneMasterBlockEntity::tick) : null;
     }
 
+    @SuppressWarnings("unused")
     public enum Variant implements StringRepresentable {
         COBBLESTONE("cobblestone"),
-        SANDSTONE("sandstone");
+        SANDSTONE("sandstone"),
+        PACKED_ICE("packed_ice"),
+        RED_SANDSTONE("red_sandstone"),
+        NETHERRACK("netherrack"),
+        END_STONE("end_stone");
 
         private final String name;
 

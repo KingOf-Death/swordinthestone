@@ -1,0 +1,7 @@
+{
+  "parent": "swordinthestone:block/sword_stone",
+  "textures": {
+    "0": "minecraft:block/cobblestone",
+    "particle": "minecraft:block/cobblestone"
+  }
+}

@@ -9,7 +9,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.client.model.generators.*;
+import net.minecraftforge.client.model.generators.ItemModelBuilder;
+import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -17,6 +19,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 public class SSItemModelProvider extends ItemModelProvider {
     private final LanguageProvider languageProvider;
     private final AnimatedTextureProvider animatedTextureProvider;
@@ -32,8 +35,8 @@ public class SSItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         getBuilder("swordinthestone:item/unique_sword").parent(new ModelFile.UncheckedModelFile("item/handheld")).transforms()
-                .transform(ItemDisplayContext.GROUND)                 .rotation(0, 0, 45)  .translation(0, 2, 0)           .scale(1.3F, 1.3F, 1.3F).end()
-                .transform(ItemDisplayContext.FIXED)                  .rotation(0, 180, 0)                                 .scale(1.3F, 1.3F, 1.3F).end()
+                .transform(ItemDisplayContext.GROUND)                 .rotation(0, 0, -135).translation(0, 3, 0)           .scale(1F, 1F, 1F)      .end()
+                .transform(ItemDisplayContext.FIXED)                  .rotation(0, 180, 180)                               .scale(1.3F, 1.3F, 1.3F).end()
                 .transform(ItemDisplayContext.HEAD)                   .rotation(0, 180, 0) .translation(0, 13, 7)          .scale(1.3F, 1.3F, 1.3F).end()
                 .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND).rotation(0, -90, 55).translation(0F, 4.0F, 0.5F)    .scale(1.1F)            .end()
                 .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND) .rotation(0, 90, -55).translation(0F, 4.0F, 0.5F)    .scale(1.1F)            .end()
@@ -42,13 +45,26 @@ public class SSItemModelProvider extends ItemModelProvider {
 
         uniqueSwordVariant(SSItems.FOREST_SWORD.get(), "forest_sword", "Sword of the Forest");
         uniqueSwordVariant(SSItems.DESERT_SWORD.get(), "desert_sword", "Sword of the Desert");
+        uniqueSwordVariant(SSItems.ARCTIC_SWORD.get(), "arctic_sword", "Sword of the Arctic");
+        uniqueSwordVariant(SSItems.PLAINS_SWORD.get(), "plains_sword", "Sword of the Plains");
+        uniqueSwordVariant(SSItems.NETHER_SWORD.get(), "nether_sword", "Sword of the Nether");
+        uniqueSwordVariant(SSItems.END_SWORD.get(), "end_sword", "Sword of the End");
 
         abilityOverlayAnim("thunder_smite", 2, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8});
         abilityOverlayAnim("vampiric", 2, null);
         abilityOverlayAnim("toxic_dash", 3, null);
+        abilityOverlayAnim("ender_rift", 2, null);
+        abilityOverlayAnim("fireball", 2, null);
+        abilityOverlayAnim("double_jump", 2, null);
+        abilityOverlayAnim("alchemist", 3, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13});
+        abilityOverlayAnim("bat_swarm", 2, null);
 
         swordStoneVariant(Blocks.COBBLESTONE);
-        swordStoneVariant(Blocks.SANDSTONE, "sandstone_bottom");
+        swordStoneVariant("sandstone", "sandstone_bottom");
+        swordStoneVariant("red_sandstone", "red_sandstone_bottom");
+        swordStoneVariant(Blocks.PACKED_ICE);
+        swordStoneVariant(Blocks.NETHERRACK);
+        swordStoneVariant(Blocks.END_STONE);
     }
 
     public void item(Item item, String name) {
@@ -96,17 +112,18 @@ public class SSItemModelProvider extends ItemModelProvider {
         ResourceLocation loc = ForgeRegistries.BLOCKS.getKey(block);
         if (loc == null) return;
         ItemModelBuilder builder = getBuilder("swordinthestone:block/sword_stone_" + loc.getPath())
-                .parent(new ModelFile.ExistingModelFile(new ResourceLocation("swordinthestone", "block/sword_stone"), existingFileHelper))
-                .texture("0", new ResourceLocation(loc.getNamespace(), "block/" + loc.getPath()));
+                .parent(new ModelFile.ExistingModelFile(new ResourceLocation("swordinthestone", "block/sword_stone"), existingFileHelper));
+        ResourceLocation texture = new ResourceLocation(loc.getNamespace(), "block/" + loc.getPath());
+        builder.texture("0", texture).texture("particle", texture);
         blockStateProvider.swordStoneVariants.put(loc.getPath(), new ModelFile.ExistingModelFile(builder.getLocation(), existingFileHelper));
     }
 
-    public void swordStoneVariant(Block block, String texture) {
-        ResourceLocation loc = ForgeRegistries.BLOCKS.getKey(block);
-        if (loc == null) return;
+    public void swordStoneVariant(String name, String blockTexture) {
+        ResourceLocation loc = new ResourceLocation(SwordInTheStone.MODID, name);
         ItemModelBuilder builder = getBuilder("swordinthestone:block/sword_stone_" + loc.getPath())
-                .parent(new ModelFile.ExistingModelFile(new ResourceLocation("swordinthestone", "block/sword_stone"), existingFileHelper))
-                .texture("0", new ResourceLocation("block/" + texture));
+                .parent(new ModelFile.ExistingModelFile(new ResourceLocation("swordinthestone", "block/sword_stone"), existingFileHelper));
+        ResourceLocation texture = new ResourceLocation("block/" + blockTexture);
+        builder.texture("0", texture).texture("particle", texture);
         blockStateProvider.swordStoneVariants.put(loc.getPath(), new ModelFile.ExistingModelFile(builder.getLocation(), existingFileHelper));
     }
 }

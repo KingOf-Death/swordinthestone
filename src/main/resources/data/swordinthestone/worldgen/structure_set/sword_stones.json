@@ -7,12 +7,24 @@
     {
       "structure": "swordinthestone:sword_stone_desert",
       "weight": 1
+    },
+    {
+      "structure": "swordinthestone:sword_stone_forest",
+      "weight": 1
+    },
+    {
+      "structure": "swordinthestone:sword_stone_snowy",
+      "weight": 1
+    },
+    {
+      "structure": "swordinthestone:sword_stone_red_desert",
+      "weight": 1
     }
   ],
   "placement": {
     "type": "minecraft:random_spread",
-    "spacing": 20,
-    "separation": 10,
+    "spacing": 40,
+    "separation": 15,
     "salt": 1446207470
   }
 }

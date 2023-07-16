@@ -1,12 +1,17 @@
 package com.bonker.swordinthestone.common.ability;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -19,6 +24,10 @@ public class SwordAbilityBuilder {
     private Function<ItemStack, Boolean> hasGlint, showBar;
     private Function<ItemStack, Integer> barWidth, barColor;
     private TickAction inventoryTick;
+    private ReleaseAction onRelease;
+    private int useDuration = 0;
+    private UseAnim useAnim = UseAnim.NONE;
+    private Multimap<Attribute, AttributeModifier> attributes;
 
     public SwordAbilityBuilder(int color) {
         this.color = color;
@@ -56,8 +65,28 @@ public class SwordAbilityBuilder {
         return this;
     }
 
+    public SwordAbilityBuilder onReleaseUsing(ReleaseAction releaseAction) {
+        this.onRelease = releaseAction;
+        return this;
+    }
+
+    public SwordAbilityBuilder useDuration(int useDuration) {
+        this.useDuration = useDuration;
+        return this;
+    }
+
+    public SwordAbilityBuilder useAnimation(UseAnim useAnim) {
+        this.useAnim = useAnim;
+        return this;
+    }
+
+    public SwordAbilityBuilder attributes(Multimap<Attribute, AttributeModifier> attributes) {
+        this.attributes = attributes;
+        return this;
+    }
+
     public SwordAbility build() {
-        return new BuiltSwordAbility(color, onHit, onKill, onUse, hasGlint, showBar, barWidth, barColor, inventoryTick);
+        return new BuiltSwordAbility(color, onHit, onKill, onUse, hasGlint, showBar, barWidth, barColor, inventoryTick, onRelease, useDuration, useAnim, attributes);
     }
 
     private static class BuiltSwordAbility extends SwordAbility {
@@ -66,11 +95,17 @@ public class SwordAbilityBuilder {
         private final Function<ItemStack, Boolean> hasGlint, showBar;
         private final Function<ItemStack, Integer> barWidth, barColor;
         private final TickAction inventoryTick;
+        private final ReleaseAction onRelease;
+        private final int useDuration;
+        private final UseAnim useAnim;
+        private final Multimap<Attribute, AttributeModifier> attributes;
 
         private BuiltSwordAbility(int color, @Nullable HitAction onHit, @Nullable HitAction onKill,
                                   @Nullable UseAction onUse, @Nullable Function<ItemStack, Boolean> hasGlint,
                                   @Nullable Function<ItemStack, Boolean> showBar, @Nullable Function<ItemStack, Integer> barWidth,
-                                  @Nullable Function<ItemStack, Integer> barColor, @Nullable TickAction inventoryTick) {
+                                  @Nullable Function<ItemStack, Integer> barColor, @Nullable TickAction inventoryTick,
+                                  @Nullable ReleaseAction onRelease, int useDuration, UseAnim useAnim,
+                                  Multimap<Attribute, AttributeModifier> attributes) {
             super(color);
             this.onHit = onHit;
             this.onKill = onKill;
@@ -80,6 +115,10 @@ public class SwordAbilityBuilder {
             this.barWidth = barWidth;
             this.barColor = barColor;
             this.inventoryTick = inventoryTick;
+            this.onRelease = onRelease;
+            this.useDuration = useDuration;
+            this.useAnim = useAnim;
+            this.attributes = attributes;
         }
 
         @Override
@@ -126,6 +165,28 @@ public class SwordAbilityBuilder {
         public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
             if (inventoryTick != null) inventoryTick.run(pStack, pLevel, pEntity, pSlotId, pIsSelected);
         }
+
+        @Override
+        public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int ticks) {
+            if (onRelease != null) onRelease.run(stack, level, entity, ticks);
+        }
+
+        @Override
+        public int getUseDuration() {
+            return useDuration;
+        }
+
+        @Override
+        public UseAnim getUseAnimation() {
+            return useAnim;
+        }
+
+        @Override
+        public void addAttributes(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
+            if (attributes != null) {
+                builder.putAll(attributes);
+            }
+        }
     }
 
     @FunctionalInterface
@@ -141,5 +202,10 @@ public class SwordAbilityBuilder {
     @FunctionalInterface
     public interface TickAction {
         void run(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected);
+    }
+
+    @FunctionalInterface
+    public interface ReleaseAction {
+        void run(ItemStack stack, Level level, LivingEntity entity, int ticks);
     }
 }

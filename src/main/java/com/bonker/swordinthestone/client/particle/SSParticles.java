@@ -10,6 +10,10 @@ import net.minecraftforge.registries.RegistryObject;
 public class SSParticles {
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, SwordInTheStone.MODID);
 
-    public static final RegistryObject<SimpleParticleType> HEAL = PARTICLE_TYPES.register("heal",
-            () -> new SimpleParticleType(false));
+
+
+    public static final RegistryObject<SimpleParticleType> HEAL = PARTICLE_TYPES.register("heal", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> FIRE = PARTICLE_TYPES.register("fire", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> AIR = PARTICLE_TYPES.register("air", () -> new SimpleParticleType(false));
+
 }

@@ -1,0 +1,6 @@
+{
+  "parent": "swordinthestone:item/unique_sword",
+  "textures": {
+    "layer0": "swordinthestone:item/ability/double_jump"
+  }
+}

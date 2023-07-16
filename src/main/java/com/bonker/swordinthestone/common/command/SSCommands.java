@@ -10,19 +10,20 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
-public class MakeSwordCommand {
+public class SSCommands {
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
         pDispatcher.register(Commands.literal("sword")
                 .requires(stack -> stack.hasPermission(2))
                 .then(Commands.argument("num", IntegerArgumentType.integer(1, 100))
-                        .executes(MakeSwordCommand::execute))
-                .executes(MakeSwordCommand::execute));
+                        .executes(SSCommands::makeSword))
+                .executes(SSCommands::makeSword));
     }
 
-    private static int execute(CommandContext<CommandSourceStack> context) {
+    private static int makeSword(CommandContext<CommandSourceStack> context) {
         ServerLevel level = context.getSource().getLevel();
         ServerPlayer player = context.getSource().getPlayer();
         if (player == null) return 0;
+
         int num;
         try {
             num = context.getArgument("num", Integer.class);

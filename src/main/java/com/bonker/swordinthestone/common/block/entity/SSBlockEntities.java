@@ -13,8 +13,11 @@ import java.util.function.Supplier;
 public class SSBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, SwordInTheStone.MODID);
 
-    public static final RegistryObject<BlockEntityType<SwordStoneBlockEntity>> SWORD_STONE = register("sword_stone",
-            () -> BlockEntityType.Builder.of(SwordStoneBlockEntity::new, SSBlocks.SWORD_STONE.get()));
+    public static final RegistryObject<BlockEntityType<SwordStoneMasterBlockEntity>> SWORD_STONE_MASTER = register("sword_stone_master",
+            () -> BlockEntityType.Builder.of(SwordStoneMasterBlockEntity::new, SSBlocks.SWORD_STONE.get()));
+
+    public static final RegistryObject<BlockEntityType<SwordStoneDummyBlockEntity>> SWORD_STONE_DUMMY = register("sword_stone_dummy",
+            () -> BlockEntityType.Builder.of(SwordStoneDummyBlockEntity::new, SSBlocks.SWORD_STONE.get()));
 
     @SuppressWarnings("DataFlowIssue") // suppress passing null for the unused datatype parameter
     private static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(String pKey, Supplier<BlockEntityType.Builder<T>> builderSupplier) {

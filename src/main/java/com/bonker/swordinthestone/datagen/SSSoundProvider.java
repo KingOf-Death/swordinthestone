@@ -22,6 +22,14 @@ public class SSSoundProvider extends SoundDefinitionsProvider {
         createMultiSound("heal", "Vampiric healing", "heal1", "heal2", "heal3", "heal4", "heal5");
         createSingleSound("toxic", "Toxins released", "toxic");
         createMultiSound("dash", "Dash attack", "dash1", "dash2", "dash3", "dash4");
+        createMultiSound("rock", "Rock crumbles", "rock1", "rock2", "rock3", "rock4", "rock5", "rock6", "rock7", "rock8");
+        createNoSubtitleSingleSound("sword_pull");
+        createSingleSound("success", "Celebratory fanfare", "success");
+        createSingleSound("laser", "Laser fires", "laser");
+        createSingleSound("fireball", "Fireball burns", "fireball");
+        createSingleSound("rift", "Ender rift created", "rift");
+        createSingleSound("jump", "Player double jumps", "jump");
+        createSingleSound("land", "Player lands softly", "land");
     }
 
     private void createMultiSound(String name, String subtitle, String... sounds) {
@@ -40,5 +48,10 @@ public class SSSoundProvider extends SoundDefinitionsProvider {
         String langKey = "subtitles.swordinthestone." + name;
         add(name, definition.subtitle(langKey));
         languageProvider.add(langKey, subtitle);
+    }
+
+    private void createNoSubtitleSingleSound(String name) {
+        ResourceLocation loc = new ResourceLocation(SwordInTheStone.MODID, name);
+        add(loc, SoundDefinition.definition().with(sound(loc)));
     }
 }

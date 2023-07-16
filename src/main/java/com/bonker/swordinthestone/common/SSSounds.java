@@ -14,6 +14,15 @@ public class SSSounds {
     public static final RegistryObject<SoundEvent> HEAL = register("heal");
     public static final RegistryObject<SoundEvent> TOXIC = register("toxic");
     public static final RegistryObject<SoundEvent> DASH = register("dash");
+    public static final RegistryObject<SoundEvent> ROCK = register("rock");
+    public static final RegistryObject<SoundEvent> SWORD_PULL = register("sword_pull");
+    public static final RegistryObject<SoundEvent> SUCCESS = register("success");
+    public static final RegistryObject<SoundEvent> LASER = register("laser");
+    public static final RegistryObject<SoundEvent> FIREBALL = register("fireball");
+    public static final RegistryObject<SoundEvent> RIFT = register("rift");
+    public static final RegistryObject<SoundEvent> JUMP = register("jump");
+    public static final RegistryObject<SoundEvent> LAND = register("land");
+
 
 
     private static RegistryObject<SoundEvent> register(String name) {

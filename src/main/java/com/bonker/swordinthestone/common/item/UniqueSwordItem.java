@@ -1,9 +1,9 @@
 package com.bonker.swordinthestone.common.item;
 
 import com.bonker.swordinthestone.client.renderer.SSBEWLR;
-import com.bonker.swordinthestone.util.AbilityUtil;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
+import com.bonker.swordinthestone.util.AbilityUtil;
 import com.bonker.swordinthestone.util.Color;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMultimap;
@@ -13,8 +13,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -36,8 +38,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class UniqueSwordItem extends SwordItem {
-    @SuppressWarnings("all") // suppress passing null for @NotNull tag
-    public static final Tier TIER = new ForgeTier(0, 0, 0, 0, 10, null, () -> Ingredient.EMPTY);
+    public static final Tier TIER = new ForgeTier(0, 0, 0, 0, 10, BlockTags.MINEABLE_WITH_PICKAXE, () -> Ingredient.EMPTY);
     public static final HashBasedTable<UniqueSwordItem, SwordAbility, Color> STYLE_TABLE = HashBasedTable.create();
     private static final int BASE_DAMAGE = 7;
     private static final float BASE_SPEED = 1.2F - 4F;
@@ -86,10 +87,11 @@ public class UniqueSwordItem extends SwordItem {
         if (slot != EquipmentSlot.MAINHAND) return super.getAttributeModifiers(slot, stack);
         float damage = stack.getOrCreateTag().getFloat(DAMAGE_TAG);
         float speed = stack.getOrCreateTag().getFloat(SPEED_TAG);
-        return ImmutableMultimap.<Attribute, AttributeModifier>builder()
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.<Attribute, AttributeModifier>builder()
                 .put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "swordinthestone.attack_damage", damage > 0 ? damage : BASE_DAMAGE, AttributeModifier.Operation.ADDITION))
-                .put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "swordinthestone.attack_speed", speed > 0 ? speed - 4F : BASE_SPEED, AttributeModifier.Operation.ADDITION))
-                .build();
+                .put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "swordinthestone.attack_speed", speed > 0 ? speed - 4F : BASE_SPEED, AttributeModifier.Operation.ADDITION));
+        AbilityUtil.getSwordAbility(stack).addAttributes(builder);
+        return builder.build();
     }
 
     @Override
@@ -106,7 +108,16 @@ public class UniqueSwordItem extends SwordItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        return AbilityUtil.getSwordAbility(pPlayer).use(pLevel, pPlayer, pUsedHand);
+        if (pUsedHand == InteractionHand.OFF_HAND) return InteractionResultHolder.pass(pPlayer.getItemInHand(pUsedHand));
+
+        InteractionResultHolder<ItemStack> result = AbilityUtil.getSwordAbility(pPlayer).use(pLevel, pPlayer, pUsedHand);
+
+        if (result.getResult() != InteractionResult.FAIL && getUseDuration(pPlayer.getItemInHand(pUsedHand)) > 0) {
+            pPlayer.startUsingItem(pUsedHand);
+            return InteractionResultHolder.consume(pPlayer.getItemInHand(pUsedHand));
+        }
+
+        return result;
     }
 
     @Override
@@ -135,6 +146,21 @@ public class UniqueSwordItem extends SwordItem {
     @Override
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
         AbilityUtil.getSwordAbility(pStack).inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
+    }
+
+    @Override
+    public void onStopUsing(ItemStack stack, LivingEntity entity, int useTime) {
+        AbilityUtil.getSwordAbility(stack).releaseUsing(stack, entity.level(), entity, useTime);
+    }
+
+    @Override
+    public int getUseDuration(ItemStack pStack) {
+        return AbilityUtil.getSwordAbility(pStack).getUseDuration();
+    }
+
+    @Override
+    public UseAnim getUseAnimation(ItemStack pStack) {
+        return AbilityUtil.getSwordAbility(pStack).getUseAnimation();
     }
 
     @Override

@@ -39,11 +39,11 @@ public class HeightAreaEffectCloud extends AreaEffectCloud {
         cloud.setOwnerImmune(true);
         cloud.setRadius(1F);
         cloud.setHeight(2.5F);
-        cloud.setRadiusOnUse(-1F);
+        cloud.setRadiusOnUse(0);
         cloud.setWaitTime(0);
         cloud.setRadiusPerTick(0);
         cloud.setDuration(60);
-        cloud.setPotion(Potions.POISON);
+        cloud.setPotion(Potions.STRONG_POISON);
         cloud.setParticle(TOXIC_DASH_PARTICLE);
         level.addFreshEntity(cloud);
     }

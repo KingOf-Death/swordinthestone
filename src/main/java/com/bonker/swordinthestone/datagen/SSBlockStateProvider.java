@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SSBlockStateProvider extends BlockStateProvider {
-    Map<String, ModelFile> swordStoneVariants = new HashMap<>();
+    final Map<String, ModelFile> swordStoneVariants = new HashMap<>();
 
     public SSBlockStateProvider(PackOutput output, String modid, ExistingFileHelper exFileHelper) {
         super(output, modid, exFileHelper);
@@ -26,6 +26,6 @@ public class SSBlockStateProvider extends BlockStateProvider {
                                     .modelFile(swordStoneVariants.get(state.getValue(SwordStoneBlock.VARIANT).getSerializedName()))
                                     .rotationY((int) state.getValue(SwordStoneBlock.FACING).getOpposite().toYRot())
                                     .build()
-                    , SwordStoneBlock.HAS_SWORD);
+                    , SwordStoneBlock.IS_DUMMY);
     }
 }

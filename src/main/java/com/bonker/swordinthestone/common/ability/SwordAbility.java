@@ -1,6 +1,7 @@
 package com.bonker.swordinthestone.common.ability;
 
-import com.bonker.swordinthestone.util.MathUtil;
+import com.bonker.swordinthestone.util.Color;
+import com.google.common.collect.ImmutableMultimap;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -8,37 +9,36 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
 public abstract class SwordAbility {
     public static final SwordAbility NONE = new SwordAbility(0x000000) {};
 
-    private final int color;
-    private final Style colorStyle;
-    private final float[] diffusedColor;
+    private final Color color;
 
     private String nameKey;
     private String titleKey;
     private String descriptionKey;
 
     public SwordAbility(int color) {
-        this.color = color;
-        this.colorStyle = Style.EMPTY.withColor(color);
-        this.diffusedColor = MathUtil.diffuseColor(color);
+        this.color = new Color(color);
     }
 
     public int getColor() {
-        return color;
+        return color.getIntColor();
     }
 
     public Style getColorStyle() {
-        return colorStyle;
+        return color.getStyle();
     }
 
     public float[] getDiffusedColor() {
-        return diffusedColor;
+        return color.getDiffusedColor();
     }
 
     public void hit(ServerLevel level, LivingEntity holder, LivingEntity victim) {}
@@ -55,9 +55,17 @@ public abstract class SwordAbility {
 
     public int getBarWidth(ItemStack pStack) {return 0;}
 
-    public int getBarColor(ItemStack pStack) {return color;}
+    public int getBarColor(ItemStack pStack) {return color.getIntColor();}
 
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {}
+
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int ticks) {}
+
+    public int getUseDuration() {return 0;}
+
+    public UseAnim getUseAnimation() {return UseAnim.NONE;}
+
+    public void addAttributes(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {}
 
     public String getNameKey() {
         if (nameKey != null) return nameKey;

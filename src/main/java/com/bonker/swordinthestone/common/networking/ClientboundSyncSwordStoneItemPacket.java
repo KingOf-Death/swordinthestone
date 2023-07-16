@@ -34,6 +34,6 @@ public class ClientboundSyncSwordStoneItemPacket {
     public void handle() {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return;
-        level.getBlockEntity(pos, SSBlockEntities.SWORD_STONE.get()).ifPresent(entity -> entity.setItem(stack));
+        level.getBlockEntity(pos, SSBlockEntities.SWORD_STONE_MASTER.get()).ifPresent(entity -> entity.setItem(stack));
     }
 }

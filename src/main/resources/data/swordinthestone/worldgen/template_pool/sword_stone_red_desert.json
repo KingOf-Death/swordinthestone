@@ -1,0 +1,15 @@
+{
+  "name": "swordinthestone:sword_stone_desert",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "swordinthestone:sword_stone_red_desert",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

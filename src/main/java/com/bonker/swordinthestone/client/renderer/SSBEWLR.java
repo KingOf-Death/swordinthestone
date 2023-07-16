@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.client.renderer;
 
+import com.bonker.swordinthestone.SwordInTheStone;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -17,13 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.RenderTypeHelper;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public class SSBEWLR extends BlockEntityWithoutLevelRenderer {
-    public static final Map<String, ResourceLocation> ABILITY_MODEL_MAP = new HashMap<>();
-    public static final Map<ResourceLocation, ResourceLocation> SWORD_MODEL_MAP = new HashMap<>();
     public static SSBEWLR INSTANCE;
     public static IClientItemExtensions extension() {return new IClientItemExtensions() {
         @Override
@@ -38,13 +33,13 @@ public class SSBEWLR extends BlockEntityWithoutLevelRenderer {
 
     @Override
     public void renderByItem(ItemStack pStack, ItemDisplayContext pDisplayContext, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
-        ResourceLocation swordModel = SWORD_MODEL_MAP.get(ForgeRegistries.ITEMS.getKey(pStack.getItem()));
-        ResourceLocation abilityModel = ABILITY_MODEL_MAP.get(pStack.getOrCreateTag().getString("ability"));
+        ResourceLocation swordModel = SwordInTheStone.SWORD_MODEL_MAP.get(ForgeRegistries.ITEMS.getKey(pStack.getItem()));
+        ResourceLocation abilityModel = SwordInTheStone.ABILITY_MODEL_MAP.get(pStack.getOrCreateTag().getString("ability"));
 
         pPoseStack.popPose(); // remove translations from ItemRenderer
         pPoseStack.pushPose();
 
-        render(pStack, swordModel, pDisplayContext, pPoseStack, pBuffer, RenderType.solid(), abilityModel == null && pStack.hasFoil(), pPackedLight, pPackedOverlay);
+        render(pStack, swordModel, pDisplayContext, pPoseStack, pBuffer, RenderType.solid(), pStack.hasFoil(), pPackedLight, pPackedOverlay);
         if (abilityModel != null) render(pStack, abilityModel, pDisplayContext, pPoseStack, pBuffer, RenderType.translucent(), pStack.hasFoil(), pPackedLight, pPackedOverlay);
     }
 
@@ -52,10 +47,6 @@ public class SSBEWLR extends BlockEntityWithoutLevelRenderer {
         poseStack.pushPose();
 
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-
-        if (renderType == RenderType.translucent()) { // if layer is ability overlay,
-            poseStack.scale(1.001F, 1.001F, 1.001F); // scale up slightly to prevent z-fighting
-        }
 
         BakedModel model = Minecraft.getInstance().getModelManager().getModel(modelLoc);
         model = model.applyTransform(displayContext, poseStack, isLeftHand(displayContext));
