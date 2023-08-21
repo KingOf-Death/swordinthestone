@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -82,8 +83,8 @@ public class SwordAbilities {
     public static final RegistryObject<SwordAbility> VAMPIRIC = register("vampiric",
             () -> new SwordAbilityBuilder(0xe20028)
                     .onKill((level, holder, victim) -> {
-                        int healing = 1 + level.random.nextInt(3);
-                        int particles = switch (healing) {default -> 2; case 2 -> 6; case 3 -> 12;};
+                        float healing = Mth.clamp(victim.getMaxHealth() * 0.2F, 1, 10);
+                        int particles = Mth.clamp(Math.round(healing * 3), 4, 20);
                         holder.heal(healing);
                         level.sendParticles(SSParticles.HEAL.get(), victim.getX(), victim.getY() + victim.getBbHeight() * 0.5, victim.getZ(), particles, victim.getBbWidth() * 0.2, victim.getBbHeight() * 0.2, victim.getBbWidth() * 0.2, 0);
                     })

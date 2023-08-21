@@ -24,7 +24,7 @@
   "ability.swordinthestone.toxic_dash.description": "Slash forward on right click leaving behind a poisonous cloud",
   "ability.swordinthestone.toxic_dash.title": "Toxic %1$s",
   "ability.swordinthestone.vampiric": "Life Steal",
-  "ability.swordinthestone.vampiric.description": "Gain 0-2 hearts upon killing a mob",
+  "ability.swordinthestone.vampiric.description": "Steal some of an enemy's health upon killing it\n(Capped at 5 hearts)",
   "ability.swordinthestone.vampiric.title": "Vampiric %1$s",
   "attribute.swordinthestone.extra_jumps": "Jump(s)",
   "entity.swordinthestone.ender_rift": "Ender Rift",

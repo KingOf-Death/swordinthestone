@@ -22,7 +22,7 @@ public class SSLanguageProvider extends LanguageProvider {
         addEntityType(SSEntityTypes.SPELL_FIREBALL, "Fireball");
 
         add(SwordAbilities.THUNDER_SMITE.get(), "Thunder Smite", "Thundering %1$s", "Sword charges when attacking mobs\nStrikes mobs with lightning when fully charged");
-        add(SwordAbilities.VAMPIRIC.get(), "Life Steal", "Vampiric %1$s", "Gain 0-2 hearts upon killing a mob");
+        add(SwordAbilities.VAMPIRIC.get(), "Life Steal", "Vampiric %1$s", "Steal some of an enemy's health upon killing it\n(Capped at 5 hearts)");
         add(SwordAbilities.TOXIC_DASH.get(), "Toxic Dash", "Toxic %1$s", "Slash forward on right click leaving behind a poisonous cloud");
         add(SwordAbilities.ENDER_RIFT.get(), "Ender Rift", "Unstable %1$s", "Hold right click and move your mouse to move an orb\nRelease to teleport to the orb");
         add(SwordAbilities.FIREBALL.get(), "Fireball", "Flaming %1$s", "Hold right click to charge up a fireball attack");
