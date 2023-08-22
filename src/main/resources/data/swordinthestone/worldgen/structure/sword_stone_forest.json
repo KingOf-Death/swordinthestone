@@ -1,12 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": [
-    "minecraft:birch_forest",
-    "minecraft:dark_forest",
-    "minecraft:flower_forest",
-    "minecraft:old_growth_birch_forest",
-    "minecraft:forest"
-  ],
+  "biomes": "#swordinthestone:has_structure/sword_stone_forest",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "beard_thin",

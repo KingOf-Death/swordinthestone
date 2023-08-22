@@ -1,9 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": [
-    "minecraft:plains",
-    "minecraft:sunflower_plains"
-  ],
+  "biomes": "#swordinthestone:has_structure/sword_stone_plains",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "beard_thin",

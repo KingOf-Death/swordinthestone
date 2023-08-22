@@ -1,8 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": [
-    "minecraft:nether_wastes"
-  ],
+  "biomes": "#swordinthestone:has_structure/sword_stone_wastes",
   "step": "surface_structures",
   "terrain_adaptation": "beard_thin",
   "spawn_overrides": {},

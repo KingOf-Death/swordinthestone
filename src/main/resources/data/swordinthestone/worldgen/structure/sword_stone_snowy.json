@@ -1,11 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": [
-    "minecraft:snowy_taiga",
-    "minecraft:snowy_plains",
-    "minecraft:snowy_slopes",
-    "minecraft:frozen_peaks"
-  ],
+  "biomes": "#swordinthestone:has_structure/sword_stone_snowy",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "beard_thin",
