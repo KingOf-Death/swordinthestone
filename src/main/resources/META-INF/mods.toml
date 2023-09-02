@@ -31,6 +31,10 @@ logoFile="swordinthestone.png" #optional
 # A text field displayed in the mod UI
 credits='''
 all code, textures, and models - bonker
+
+--- translations ---
+Chinese (Simplified) - junshengxie (curseforge)
+
 --- sounds ----
 dash - cyclonek (freesound.org) [Attribution 4.0, modified]
 fireball - NoahBangs (freesound.org) [Attribution 4.0]
