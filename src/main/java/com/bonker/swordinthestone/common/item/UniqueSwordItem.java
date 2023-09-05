@@ -1,6 +1,7 @@
 package com.bonker.swordinthestone.common.item;
 
 import com.bonker.swordinthestone.client.renderer.SSBEWLR;
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
 import com.bonker.swordinthestone.util.AbilityUtil;
@@ -62,8 +63,9 @@ public class UniqueSwordItem extends SwordItem {
     public static ItemStack getRandom(String type, RandomSource random) {
         if (swords == null)
             swords = SSItems.ITEMS.getEntries().stream().filter(item -> item.get() instanceof UniqueSwordItem).map(item -> (UniqueSwordItem) item.get()).toList();
-        if (abilities == null)
-            abilities = SwordAbilities.SWORD_ABILITIES.getEntries().stream().map(RegistryObject::get).toList();
+        if (abilities == null) {
+            reloadAbilities();
+        }
 
         SwordAbility ability = abilities.get(random.nextInt(abilities.size()));
 
@@ -80,6 +82,13 @@ public class UniqueSwordItem extends SwordItem {
         stack.getOrCreateTag().putFloat(UniqueSwordItem.DAMAGE_TAG, 7 + 0.5F * random.nextInt(7));
         stack.getOrCreateTag().putFloat(UniqueSwordItem.SPEED_TAG, 1.2F + 0.1F * random.nextInt(6));
         return stack;
+    }
+
+    public static void reloadAbilities() {
+        abilities = SwordAbilities.SWORD_ABILITIES.getEntries().stream()
+                .filter(obj -> !SSConfig.disabledAbilities.contains(obj.getId()))
+                .map(RegistryObject::get)
+                .toList();
     }
 
     @Override
