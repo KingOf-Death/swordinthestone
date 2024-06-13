@@ -1,6 +1,0 @@
-{
-  "parent": "swordinthestone:item/unique_sword",
-  "textures": {
-    "layer0": "swordinthestone:item/desert_sword"
-  }
-}

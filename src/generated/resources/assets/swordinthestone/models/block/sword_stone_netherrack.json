@@ -1,7 +1,0 @@
-{
-  "parent": "swordinthestone:block/sword_stone",
-  "textures": {
-    "0": "minecraft:block/netherrack",
-    "particle": "minecraft:block/netherrack"
-  }
-}

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:builtin/entity",
-  "textures": {
-    "layer0": "swordinthestone:item/end_sword"
-  }
-}
