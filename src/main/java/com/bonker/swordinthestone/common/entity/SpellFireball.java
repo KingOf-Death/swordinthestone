@@ -3,6 +3,7 @@ package com.bonker.swordinthestone.common.entity;
 import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.common.SSSounds;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -48,8 +49,12 @@ public class SpellFireball extends Fireball {
             lerpTo(pos.x(), pos.y() - 0.5, pos.z(), getXRot(), getYRot(), 6, false);
         }
 
-        if (getPower() <= 4.0F) {
-            addPower(0.02F);
+        if (getPower() <= 2.0F) {
+            addPower(0.08F);
+        } else if (getPower() <= 4.0F) {
+            addPower(0.04F);
+        } else if (!level().isClientSide) {
+            ((ServerLevel) level()).sendParticles(ParticleTypes.SMOKE, getX(), getY() + 0.5, getZ(), 8, 0, 0, 0, 0.1F);
         }
 
         if (!beenShot && getEntityData().get(DATA_SHOT)) {
@@ -69,7 +74,19 @@ public class SpellFireball extends Fireball {
     protected void onHit(HitResult pResult) {
         super.onHit(pResult);
         if (!level().isClientSide) {
+            // make owner invulnerable to damage until after the explosion damage is processed
+            Entity owner = getOwner();
+            boolean isInvulnerable = false;
+            if (owner != null) {
+                isInvulnerable = owner.isInvulnerable();
+                if (!isInvulnerable) owner.setInvulnerable(true);
+            }
+
             level().explode(this, getX(), getY() + 0.5, getZ(), getPower(), true, Level.ExplosionInteraction.BLOCK);
+
+            // remove owner invulnerability
+            if (owner != null && !isInvulnerable) owner.setInvulnerable(false);
+
             double radius = Math.min(1, getPower());
             ((ServerLevel) level()).sendParticles(SSParticles.FIRE.get(), getX(), getY(), getZ(), Mth.floor(radius * 25F), radius, radius, radius, 0F);
             discard();

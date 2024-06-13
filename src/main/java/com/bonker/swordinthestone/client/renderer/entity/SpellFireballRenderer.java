@@ -33,7 +33,6 @@ public class SpellFireballRenderer extends ThrownItemRenderer<SpellFireball> {
 
     @Override
     protected int getBlockLightLevel(SpellFireball pEntity, BlockPos pPos) {
-        if (pEntity.getPower() < 4.0F || System.currentTimeMillis() % 300 >= 150) return super.getBlockLightLevel(pEntity, pPos);
         return 15;
     }
 }
