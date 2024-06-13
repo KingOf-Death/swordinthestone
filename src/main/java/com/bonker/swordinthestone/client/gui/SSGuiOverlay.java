@@ -30,9 +30,11 @@ public class SSGuiOverlay {
                 BlockEntity entity = minecraft.level.getBlockEntity(pos);
                 if (entity instanceof ISwordStoneBlockEntity swordStone) {
                     SwordStoneMasterBlockEntity master = swordStone.getMaster();
-                    if (master == null || master.getItem().isEmpty() || minecraft.player == null || minecraft.player.isSpectator()) return;
+                    if (master == null || !master.hasSword || minecraft.player == null || minecraft.player.isSpectator()) return;
 
-                    if (master.progress == 0) {
+                    if (master.cannotInteract()) {
+                        guiGraphics.blit(TEXTURE, guiGraphics.guiWidth() / 2 + 2, guiGraphics.guiHeight() / 2 + 2, master.idleTicks % 40 > 20 ? 23 : 11, 0, 12, 12);
+                    } else if (master.progress == 0) {
                         guiGraphics.blit(TEXTURE, guiGraphics.guiWidth() / 2 + 1, guiGraphics.guiHeight() / 2 + 1, 0, 0, 11, 18);
                     } else {
                         BlockState state = minecraft.level.getBlockState(pos);

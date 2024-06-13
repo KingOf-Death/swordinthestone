@@ -70,10 +70,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
     public InteractionResult interact(Player pPlayer, InteractionHand pHand) {
         assert level != null;
 
-        if ((idleTicks > 0 && idleTicks < BEACON_ANIMATION_TIME) // can't be spinning
-            || !hasSword // has a sword to shake
-            || ticksSinceLastInteraction <= SHAKE_ANIMATION_TIME) // can't be shaking
-            return InteractionResult.PASS;
+        if (cannotInteract() || ticksSinceLastInteraction <= SHAKE_ANIMATION_TIME) return InteractionResult.PASS;
 
         ticksSinceLastInteraction = 0;
         if (++progress >= REQUIRED_SHAKES) {
@@ -145,17 +142,23 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
 
         if (entity.isIdle()) {
             entity.idleTicks++;
-            if (entity.idleTicks == 75 && !level.isClientSide) {
-                SSNetworking.sendToClientsLoadingBE(new ClientboundSyncSwordStoneDataPacket(blockPos, false, (short) 75), entity);
 
-                level.playSound(null, entity.getBlockPos(), SSSounds.LASER.get(), SoundSource.BLOCKS, 4.5F, 0.6F + level.random.nextFloat() * 0.8F);
-            }
-            if (entity.idleTicks >= BEACON_ANIMATION_CYCLE) {
-                entity.idleTicks = 0;
+            if (!level.isClientSide) {
+                if (entity.idleTicks >= BEACON_ANIMATION_CYCLE) {
+                    entity.idleTicks = 0;
+
+                    SSNetworking.sendToClientsLoadingBE(new ClientboundSyncSwordStoneDataPacket(blockPos, false, (short) 0), entity);
+                }
+            } else if (entity.idleTicks == 75) {
+                level.playLocalSound(entity.getBlockPos(), SSSounds.LASER.get(), SoundSource.BLOCKS, 4.5F, 0.6F + level.random.nextFloat() * 0.8F, false);
             }
         } else {
             entity.idleTicks = 0;
         }
+    }
+
+    public boolean cannotInteract() {
+        return !hasSword || (idleTicks > 0 && idleTicks < SwordStoneMasterBlockEntity.BEACON_ANIMATION_TIME);
     }
 
     @Override
