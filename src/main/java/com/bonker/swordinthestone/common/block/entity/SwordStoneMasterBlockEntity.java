@@ -30,6 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nullable;
+
 public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordStoneBlockEntity {
     public static final String ITEM_TAG = "Item";
     public static final String VARIANT_TAG = "variant";
@@ -38,7 +40,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
     public static final int BEACON_ANIMATION_TIME = 140;
     public static final int BEACON_ANIMATION_CYCLE = 600;
     public static final int SHAKE_ANIMATION_TIME = 10;
-    public static final int REQUIRED_SHAKES = 40;
+    public static final int REQUIRED_SHAKES = 47;
     public static final int IDLE_TIME = 100;
 
     private static final ParticleOptions PARTICLE_FALLBACK = ParticleTypes.NOTE;
@@ -47,7 +49,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
     public short progress = 0;
     public int ticksSinceLastInteraction = 0;
     public int idleTicks;
-    private boolean hasSword = false;
+    public boolean hasSword = false;
     private boolean sendSyncPacket = false;
     private String variant = "";
 
@@ -78,7 +80,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
             progress = 0;
             finish(pPlayer);
         } else {
-            level.playSound(pPlayer, getBlockPos(), SSSounds.SWORD_PULL.get(), SoundSource.BLOCKS, Mth.clamp(progress - 2, 0, 10) * 0.1F, Math.max(progress * 0.04F, 1.3F));
+            level.playSound(pPlayer, getBlockPos(), SSSounds.SWORD_PULL.get(), SoundSource.BLOCKS, Mth.clamp(progress - 2, 0, 10) * 0.1F, Math.max(progress * 0.03F, 1.1F));
         }
         level.playSound(pPlayer, getBlockPos(), SSSounds.ROCK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 
@@ -154,6 +156,12 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
         } else {
             entity.idleTicks = 0;
         }
+    }
+
+    @Override
+    @Nullable
+    public SwordStoneMasterBlockEntity getMaster() {
+        return this;
     }
 
     private ParticleOptions getShakeParticle() {

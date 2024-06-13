@@ -1,6 +1,7 @@
 package com.bonker.swordinthestone.client;
 
 import com.bonker.swordinthestone.SwordInTheStone;
+import com.bonker.swordinthestone.client.gui.SSGuiOverlay;
 import com.bonker.swordinthestone.client.particle.AirParticle;
 import com.bonker.swordinthestone.client.particle.FireParticle;
 import com.bonker.swordinthestone.client.particle.HealParticle;
@@ -22,10 +23,7 @@ import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -85,6 +83,11 @@ public class ClientEvents {
             event.registerSpriteSet(SSParticles.HEAL.get(), HealParticle.Provider::new);
             event.registerSpriteSet(SSParticles.FIRE.get(), FireParticle.Provider::new);
             event.registerSpriteSet(SSParticles.AIR.get(), AirParticle.Provider::new);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterGuiOverlays(final RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll(SSGuiOverlay.NAME, SSGuiOverlay.OVERLAY);
         }
     }
 }

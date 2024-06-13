@@ -10,11 +10,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
 public interface ISwordStoneBlockEntity {
     InteractionResult interact(Player pPlayer, InteractionHand pHand);
+
+    @Nullable
+    SwordStoneMasterBlockEntity getMaster();
 
     static List<BlockPos> getBlocks(BlockPos pos, BlockState state) {
         if (!state.hasProperty(SwordStoneBlock.FACING)) return List.of();

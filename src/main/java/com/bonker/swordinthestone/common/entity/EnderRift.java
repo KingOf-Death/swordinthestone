@@ -108,13 +108,7 @@ public class EnderRift extends Projectile {
 
     @Override
     public boolean shouldRenderAtSqrDistance(double pDistance) {
-        double d0 = getBoundingBox().getSize() * 4.0D;
-        if (Double.isNaN(d0)) {
-            d0 = 4.0D;
-        }
-
-        d0 *= 64.0D;
-        return pDistance < d0 * d0;
+        return pDistance < 16384; // 128^2
     }
 
     @Override

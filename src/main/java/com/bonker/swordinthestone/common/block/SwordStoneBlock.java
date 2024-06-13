@@ -104,12 +104,11 @@ public class SwordStoneBlock extends BaseEntityBlock {
         return pBlockEntityType == SSBlockEntities.SWORD_STONE_MASTER.get() ? createTickerHelper(pBlockEntityType, SSBlockEntities.SWORD_STONE_MASTER.get(), SwordStoneMasterBlockEntity::tick) : null;
     }
 
-    @SuppressWarnings("unused")
     public enum Variant implements StringRepresentable {
         COBBLESTONE("cobblestone"),
         SANDSTONE("sandstone"),
-        PACKED_ICE("packed_ice"),
         RED_SANDSTONE("red_sandstone"),
+        PACKED_ICE("packed_ice"),
         NETHERRACK("netherrack"),
         END_STONE("end_stone");
 
@@ -117,11 +116,6 @@ public class SwordStoneBlock extends BaseEntityBlock {
 
         Variant(String pName) {
             this.name = pName;
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
         }
 
         @Override

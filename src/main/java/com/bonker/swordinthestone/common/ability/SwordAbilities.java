@@ -95,7 +95,7 @@ public class SwordAbilities {
             () -> new SwordAbilityBuilder(0x52c539)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-                        if (!(player.onGround() || player.isUnderWater())) return InteractionResultHolder.pass(stack);
+//                        if (!(player.onGround() || player.isUnderWater())) return InteractionResultHolder.pass(stack);
                         if (AbilityUtil.isOnCooldown(stack, level, TOXIC_DASH_COOLDOWN)) return InteractionResultHolder.fail(stack);
 
                         level.playSound(player, player.getX(), player.getY(), player.getZ(), SSSounds.DASH.get(), SoundSource.PLAYERS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
@@ -174,6 +174,7 @@ public class SwordAbilities {
                         if (!level.isClientSide) {
                             SpellFireball fireball = new SpellFireball(level, player);
                             fireball.setPower(0.1F);
+                            fireball.setPos(player.getEyePosition().add(player.getLookAngle().scale(1.5)));
                             level.addFreshEntity(fireball);
                         }
 

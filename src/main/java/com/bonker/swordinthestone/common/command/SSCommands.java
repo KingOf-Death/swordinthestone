@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 public class SSCommands {
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
         pDispatcher.register(Commands.literal("sword")
-                .requires(stack -> stack.hasPermission(2))
+                .requires(stack -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("num", IntegerArgumentType.integer(1, 100))
                         .executes(SSCommands::makeSword))
                 .executes(SSCommands::makeSword));

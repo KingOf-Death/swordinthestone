@@ -8,6 +8,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -52,6 +53,7 @@ public class SpellFireball extends Fireball {
         }
 
         if (!beenShot && getEntityData().get(DATA_SHOT)) {
+            playSound(SoundEvents.FIRECHARGE_USE, 1.0F, 1.0F);
             Vec3 vec = (owner == null ? this : owner).getLookAngle().scale(0.2);
             xPower = vec.x;
             yPower = vec.y;

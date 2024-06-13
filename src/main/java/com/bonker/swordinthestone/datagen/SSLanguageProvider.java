@@ -14,7 +14,7 @@ public class SSLanguageProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        add("item_group.swordinthestone.swords", "Unique Swords");
+        add("item_group.swordinthestone.swords", "Sword in the Stone");
         add("attribute.swordinthestone.extra_jumps", "Jump(s)");
 
         addEntityType(SSEntityTypes.HEIGHT_AREA_EFFECT_CLOUD, "Area Effect Cloud");
