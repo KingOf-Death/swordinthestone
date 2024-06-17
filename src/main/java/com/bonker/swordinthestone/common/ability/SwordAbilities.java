@@ -96,7 +96,6 @@ public class SwordAbilities {
             () -> new SwordAbilityBuilder(0x52c539)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-//                        if (!(player.onGround() || player.isUnderWater())) return InteractionResultHolder.pass(stack);
                         if (AbilityUtil.isOnCooldown(stack, level, TOXIC_DASH_COOLDOWN)) return InteractionResultHolder.fail(stack);
 
                         level.playSound(player, player.getX(), player.getY(), player.getZ(), SSSounds.DASH.get(), SoundSource.PLAYERS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
@@ -116,13 +115,10 @@ public class SwordAbilities {
                             SSNetworking.sendToPlayer(new ClientboundSyncDeltaPacket(player.getDeltaMovement()), (ServerPlayer) player);
                         }
 
-                        AbilityUtil.setOnCooldown(stack, level, TOXIC_DASH_COOLDOWN);
+                        AbilityUtil.setOnCooldown(stack, level);
                         return InteractionResultHolder.success(stack);
                     })
-                    .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, TOXIC_DASH_COOLDOWN))
-                    .customBar(AbilityUtil::showCooldownBar,
-                               stack -> AbilityUtil.cooldownProgress(stack, TOXIC_DASH_COOLDOWN),
-                               null)
+                    .addCooldown(TOXIC_DASH_COOLDOWN)
                     .build());
 
     // Ender Rift
@@ -154,13 +150,10 @@ public class SwordAbilities {
                             }
                         }
 
-                        AbilityUtil.setOnCooldown(stack, level, ENDER_RIFT_COOLDOWN);
+                        AbilityUtil.setOnCooldown(stack, level);
                     })
                     .useDuration(ENDER_RIFT_DURATION)
-                    .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, ENDER_RIFT_COOLDOWN))
-                    .customBar(AbilityUtil::showCooldownBar,
-                            stack -> AbilityUtil.cooldownProgress(stack, ENDER_RIFT_COOLDOWN),
-                            null)
+                    .addCooldown(ENDER_RIFT_COOLDOWN)
                     .useAnimation(UseAnim.BLOCK)
                     .build());
 
@@ -185,13 +178,10 @@ public class SwordAbilities {
                         if (!level.isClientSide) {
                             Util.getOwnedProjectiles(entity, SpellFireball.class, (ServerLevel) level).forEach(e -> e.getEntityData().set(SpellFireball.DATA_SHOT, true));
                         }
-                        AbilityUtil.setOnCooldown(stack, level, FIREBALL_COOLDOWN);
+                        AbilityUtil.setOnCooldown(stack, level);
                     })
                     .useDuration(72000)
-                    .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, FIREBALL_COOLDOWN))
-                    .customBar(AbilityUtil::showCooldownBar,
-                            stack -> AbilityUtil.cooldownProgress(stack, FIREBALL_COOLDOWN),
-                            null)
+                    .addCooldown(FIREBALL_COOLDOWN)
                     .useAnimation(UseAnim.BOW)
                     .build());
 
@@ -265,13 +255,10 @@ public class SwordAbilities {
                 }
 
                 player.swing(InteractionHand.MAIN_HAND);
-                AbilityUtil.setOnCooldown(stack, level, BAT_SWARM_COOLDOWN);
+                AbilityUtil.setOnCooldown(stack, level);
                 return InteractionResultHolder.success(stack);
             })
-            .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, BAT_SWARM_COOLDOWN))
-            .customBar(AbilityUtil::showCooldownBar,
-                    stack -> AbilityUtil.cooldownProgress(stack, BAT_SWARM_COOLDOWN),
-                    null)
+            .addCooldown(BAT_SWARM_COOLDOWN)
             .build());
 
 

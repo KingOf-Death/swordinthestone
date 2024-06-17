@@ -1,8 +1,8 @@
 package com.bonker.swordinthestone.common.entity;
 
-import com.bonker.swordinthestone.client.ClientUtil;
 import com.bonker.swordinthestone.common.networking.ClientboundEnderRiftPacket;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
+import com.bonker.swordinthestone.util.SideUtil;
 import com.bonker.swordinthestone.util.Util;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -55,7 +55,7 @@ public class EnderRift extends Projectile {
         if (!(getOwner() instanceof Player owner)) return;
 
         if (getEntityData().get(DATA_CONTROLLING)) {
-            if (level().isClientSide) ClientUtil.controlEnderRift(this, owner);
+            if (level().isClientSide) SideUtil.controlEnderRift(this, owner);
         } else {
             move(MoverType.SELF, getDeltaMovement());
 

@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.ability;
 
+import com.bonker.swordinthestone.util.AbilityUtil;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.server.level.ServerLevel;
@@ -83,6 +84,12 @@ public class SwordAbilityBuilder {
     public SwordAbilityBuilder attributes(Multimap<Attribute, AttributeModifier> attributes) {
         this.attributes = attributes;
         return this;
+    }
+
+    public SwordAbilityBuilder addCooldown(int time) {
+        return customBar(stack -> AbilityUtil.showCooldownBar(stack, time),
+                stack -> AbilityUtil.cooldownProgress(stack, time),
+                null);
     }
 
     public SwordAbility build() {
