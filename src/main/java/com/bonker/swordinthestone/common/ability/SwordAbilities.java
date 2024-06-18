@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMultimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -263,7 +262,7 @@ public class SwordAbilities {
 
 
     private static RegistryObject<SwordAbility> register(String name, Supplier<SwordAbility> supplier) {
-        SwordInTheStone.ABILITY_MODEL_MAP.put(SwordInTheStone.MODID + ":" + name, new ResourceLocation(SwordInTheStone.MODID, "item/ability/" + name));
+        SwordInTheStone.ABILITY_MODEL_MAP.put(SwordInTheStone.MODID + ":" + name, Util.makeResource("item/ability/" + name));
         return SWORD_ABILITIES.register(name, supplier);
     }
 }

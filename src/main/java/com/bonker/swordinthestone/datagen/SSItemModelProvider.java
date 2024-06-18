@@ -1,8 +1,8 @@
 package com.bonker.swordinthestone.datagen;
 
-import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.item.SSItems;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -85,7 +85,7 @@ public class SSItemModelProvider extends ItemModelProvider {
     }
 
     public void abilityOverlay(String id) {
-        ResourceLocation loc = new ResourceLocation(SwordInTheStone.MODID, "item/ability/" + id);
+        ResourceLocation loc = Util.makeResource("item/ability/" + id);
         getBuilder(loc.toString())
                 .parent(new ModelFile.UncheckedModelFile("swordinthestone:item/unique_sword"))
                 .texture("layer0", new ResourceLocation(loc.getNamespace(), loc.getPath()));
@@ -93,7 +93,7 @@ public class SSItemModelProvider extends ItemModelProvider {
 
     public void abilityOverlayAnim(String id, int frametime, @Nullable int[] frames) {
         animatedTextureProvider.create("item/ability/" + id).frametime(frametime).frames(frames);
-        ResourceLocation loc = new ResourceLocation(SwordInTheStone.MODID, "item/ability/" + id);
+        ResourceLocation loc = Util.makeResource("item/ability/" + id);
         getBuilder(loc.toString())
                 .parent(new ModelFile.UncheckedModelFile("swordinthestone:item/unique_sword"))
                 .texture("layer0", new ResourceLocation(loc.getNamespace(), loc.getPath()));
@@ -101,7 +101,7 @@ public class SSItemModelProvider extends ItemModelProvider {
 
     public void uniqueSwordVariant(UniqueSwordItem item, String id, String name) {
         languageProvider.add(item, name);
-        ResourceLocation loc = new ResourceLocation(SwordInTheStone.MODID, "item/sword/" + id);
+        ResourceLocation loc = Util.makeResource("item/sword/" + id);
         getBuilder(loc.toString())
                 .parent(new ModelFile.UncheckedModelFile("swordinthestone:item/unique_sword"))
                 .texture("layer0", new ResourceLocation(loc.getNamespace(), "item/" + id));
@@ -119,7 +119,7 @@ public class SSItemModelProvider extends ItemModelProvider {
     }
 
     public void swordStoneVariant(String name, String blockTexture) {
-        ResourceLocation loc = new ResourceLocation(SwordInTheStone.MODID, name);
+        ResourceLocation loc = Util.makeResource(name);
         ItemModelBuilder builder = getBuilder("swordinthestone:block/sword_stone_" + loc.getPath())
                 .parent(new ModelFile.ExistingModelFile(new ResourceLocation("swordinthestone", "block/sword_stone"), existingFileHelper));
         ResourceLocation texture = new ResourceLocation("block/" + blockTexture);

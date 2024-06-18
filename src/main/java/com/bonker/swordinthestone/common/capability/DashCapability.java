@@ -1,6 +1,6 @@
 package com.bonker.swordinthestone.common.capability;
 
-import com.bonker.swordinthestone.SwordInTheStone;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class DashCapability implements IDashCapability {
     public static final Capability<IDashCapability> DASH = CapabilityManager.get(new CapabilityToken<>(){});
 
-    public static final ResourceLocation NAME = new ResourceLocation(SwordInTheStone.MODID, "dash");
+    public static final ResourceLocation NAME = Util.makeResource("dash");
 
     public static LazyOptional<IDashCapability> createOptional() {
         IDashCapability cap = new DashCapability();

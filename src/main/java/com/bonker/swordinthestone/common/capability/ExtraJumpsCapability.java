@@ -1,7 +1,7 @@
 package com.bonker.swordinthestone.common.capability;
 
-import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.SSAttributes;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class ExtraJumpsCapability implements IExtraJumpsCapability {
     public static final Capability<IExtraJumpsCapability> JUMPS = CapabilityManager.get(new CapabilityToken<>(){});
-    public static final ResourceLocation NAME = new ResourceLocation(SwordInTheStone.MODID, "jumps");
+    public static final ResourceLocation NAME = Util.makeResource("jumps");
     private static final String EXTRA_JUMPS_KEY = "extraJumps";
 
     public static int getJumpsUsed(Player player) {

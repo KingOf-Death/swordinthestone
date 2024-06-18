@@ -1,7 +1,7 @@
 package com.bonker.swordinthestone.common;
 
 import com.bonker.swordinthestone.SwordInTheStone;
-import net.minecraft.resources.ResourceLocation;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -26,6 +26,6 @@ public class SSSounds {
 
 
     private static RegistryObject<SoundEvent> register(String name) {
-        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(SwordInTheStone.MODID, name)));
+        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(Util.makeResource(name)));
     }
 }

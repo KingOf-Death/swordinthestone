@@ -1,7 +1,7 @@
 package com.bonker.swordinthestone.client.renderer.entity;
 
-import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.entity.EnderRift;
+import com.bonker.swordinthestone.util.Util;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -16,7 +16,7 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 public class EnderRiftRenderer extends EntityRenderer<EnderRift> {
-    private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation(SwordInTheStone.MODID, "textures/entity/ender_rift.png");
+    private static final ResourceLocation TEXTURE_LOCATION = Util.makeResource("textures/entity/ender_rift.png");
     private static final RenderType RENDER_TYPE = RenderType.entityCutoutNoCull(TEXTURE_LOCATION);
 
     public EnderRiftRenderer(EntityRendererProvider.Context context) {

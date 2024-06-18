@@ -1,10 +1,10 @@
 package com.bonker.swordinthestone.client.gui;
 
-import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.block.SSBlocks;
 import com.bonker.swordinthestone.common.block.SwordStoneBlock;
 import com.bonker.swordinthestone.common.block.entity.ISwordStoneBlockEntity;
 import com.bonker.swordinthestone.common.block.entity.SwordStoneMasterBlockEntity;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +17,7 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 public class SSGuiOverlay {
     public static final String NAME = "swordinthestone_overlay";
-    private static final ResourceLocation TEXTURE = new ResourceLocation(SwordInTheStone.MODID, "textures/gui/overlay.png");
+    private static final ResourceLocation TEXTURE = Util.makeResource("textures/gui/overlay.png");
     private static final int BAR_WIDTH = 94;
     private static final int BAR_HEIGHT = 18;
 

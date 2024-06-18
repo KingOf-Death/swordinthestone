@@ -3,9 +3,9 @@ package com.bonker.swordinthestone.common.item;
 import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +43,7 @@ public class SSItems {
             .build());
 
     private static RegistryObject<UniqueSwordItem> swordVariant(String name, int color) {
-        SwordInTheStone.SWORD_MODEL_MAP.put(new ResourceLocation(SwordInTheStone.MODID, name), new ResourceLocation(SwordInTheStone.MODID, "item/sword/" + name));
+        SwordInTheStone.SWORD_MODEL_MAP.put(Util.makeResource(name), Util.makeResource("item/sword/" + name));
         return ITEMS.register(name, () -> new UniqueSwordItem(color, new Item.Properties()));
     }
 }
