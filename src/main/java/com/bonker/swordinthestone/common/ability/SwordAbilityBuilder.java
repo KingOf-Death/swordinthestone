@@ -93,10 +93,10 @@ public class SwordAbilityBuilder {
     }
 
     public SwordAbility build() {
-        return new BuiltSwordAbility(color, onHit, onKill, onUse, hasGlint, showBar, barWidth, barColor, inventoryTick, onRelease, useDuration, useAnim, attributes);
+        return new SwordAbilityImpl(color, onHit, onKill, onUse, hasGlint, showBar, barWidth, barColor, inventoryTick, onRelease, useDuration, useAnim, attributes);
     }
 
-    private static class BuiltSwordAbility extends SwordAbility {
+    private static class SwordAbilityImpl extends SwordAbility {
         private final HitAction onHit, onKill;
         private final UseAction onUse;
         private final Function<ItemStack, Boolean> hasGlint, showBar;
@@ -107,12 +107,12 @@ public class SwordAbilityBuilder {
         private final UseAnim useAnim;
         private final Multimap<Attribute, AttributeModifier> attributes;
 
-        private BuiltSwordAbility(int color, @Nullable HitAction onHit, @Nullable HitAction onKill,
-                                  @Nullable UseAction onUse, @Nullable Function<ItemStack, Boolean> hasGlint,
-                                  @Nullable Function<ItemStack, Boolean> showBar, @Nullable Function<ItemStack, Integer> barWidth,
-                                  @Nullable Function<ItemStack, Integer> barColor, @Nullable TickAction inventoryTick,
-                                  @Nullable ReleaseAction onRelease, int useDuration, UseAnim useAnim,
-                                  Multimap<Attribute, AttributeModifier> attributes) {
+        private SwordAbilityImpl(int color, @Nullable HitAction onHit, @Nullable HitAction onKill,
+                                 @Nullable UseAction onUse, @Nullable Function<ItemStack, Boolean> hasGlint,
+                                 @Nullable Function<ItemStack, Boolean> showBar, @Nullable Function<ItemStack, Integer> barWidth,
+                                 @Nullable Function<ItemStack, Integer> barColor, @Nullable TickAction inventoryTick,
+                                 @Nullable ReleaseAction onRelease, int useDuration, UseAnim useAnim,
+                                 Multimap<Attribute, AttributeModifier> attributes) {
             super(color);
             this.onHit = onHit;
             this.onKill = onKill;
