@@ -14,19 +14,21 @@ import com.bonker.swordinthestone.util.AbilityUtil;
 import com.bonker.swordinthestone.util.Util;
 import com.google.common.collect.ImmutableMultimap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ambient.Bat;
@@ -35,7 +37,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -45,12 +47,14 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 public class SwordAbilities {
-    public static final DeferredRegister<SwordAbility> SWORD_ABILITIES = DeferredRegister.create(new ResourceLocation(SwordInTheStone.MODID, "sword_abilities"), SwordInTheStone.MODID);
+    public static final DeferredRegister<SwordAbility> SWORD_ABILITIES = DeferredRegister.create(Util.makeResource("sword_abilities"), SwordInTheStone.MODID);
     public static final Supplier<IForgeRegistry<SwordAbility>> SWORD_ABILITY_REGISTRY = SWORD_ABILITIES.makeRegistry(RegistryBuilder::new);
 
     // Thunder Smite
@@ -195,41 +199,88 @@ public class SwordAbilities {
                     .build());
 
     // Alchemist
-    public static final List<Potion> POSITIVE_EFFECTS = List.of(Potions.FIRE_RESISTANCE, Potions.LEAPING, Potions.REGENERATION, Potions.WATER_BREATHING,
-            Potions.NIGHT_VISION, Potions.SWIFTNESS, Potions.STRENGTH, Potions.STRONG_SWIFTNESS, Potions.STRONG_LEAPING, Potions.STRONG_REGENERATION, Potions.STRONG_STRENGTH);
-    public static final List<Potion> NEGATIVE_EFFECTS = List.of(Potions.POISON, Potions.SLOWNESS, Potions.WEAKNESS, Potions.STRONG_POISON, Potions.STRONG_SLOWNESS);
+    public static final TagKey<Potion> ALCHEMIST_SELF_EFFECTS = Util.makeTag(Registries.POTION, "alchemist_self");
+    public static final TagKey<Potion> ALCHEMIST_VICTIM_EFFECTS = Util.makeTag(Registries.POTION, "alchemist_victim");
     public static final RegistryObject<SwordAbility> ALCHEMIST = register("alchemist",
             () -> new SwordAbilityBuilder(0xffbf47)
             .onHit((level, attacker, victim) -> {
-                if (victim.isDeadOrDying()) return;
-                if (attacker instanceof Player player && player.getAttackStrengthScale(0F) < 1.0) return;
-
-                if (level.random.nextFloat() > 0.5F) {
-                    Potion potion = Util.randomListItem(NEGATIVE_EFFECTS, level.random);
-                    MobEffectInstance effectInst = Util.copyWithDuration(potion.getEffects().get(0), 300);
-                    victim.addEffect(effectInst);
-
-                    if (attacker instanceof ServerPlayer player) {
-                        AbilityUtil.sendAlchemistMsg(player, effectInst, false);
-                    }
-
-                    level.levelEvent(LevelEvent.PARTICLES_SPELL_POTION_SPLASH, BlockPos.containing(victim.position()), PotionUtils.getColor(potion));
+                if (!level.isClientSide && !victim.isDeadOrDying() &&
+                        !(attacker instanceof Player player && player.getAttackStrengthScale(0F) < 1.0)) {
+                    handleAlchemistAbility(level, attacker, victim);
                 }
             })
             .onKill((level, attacker, victim) -> {
-                if (level.random.nextFloat() > 0.5) {
-                    Potion potion = Util.randomListItem(POSITIVE_EFFECTS, level.random);
-                    MobEffectInstance effectInst = Util.copyWithDuration(potion.getEffects().get(0), 300);
-                    attacker.addEffect(effectInst);
-
-                    if (attacker instanceof ServerPlayer player) {
-                        AbilityUtil.sendAlchemistMsg(player, effectInst, true);
-                    }
-
-                    level.levelEvent(LevelEvent.PARTICLES_SPELL_POTION_SPLASH, BlockPos.containing(attacker.position()), PotionUtils.getColor(potion));
+                if (!level.isClientSide) {
+                    handleAlchemistAbility(level, attacker, null);
                 }
             })
             .build());
+
+    public static void handleAlchemistAbility(Level level, LivingEntity attacker, @Nullable LivingEntity victim) {
+        float chance = victim == null ? 0.5F : 0.5F;
+        if (level.random.nextFloat() <= chance) {
+            for (int tries = 0; tries < 3; tries++) {
+                Optional<Holder<Potion>> optional = level.registryAccess().registryOrThrow(Registries.POTION)
+                        .getOrCreateTag(victim == null ? ALCHEMIST_SELF_EFFECTS : ALCHEMIST_VICTIM_EFFECTS)
+                        .getRandomElement(level.random);
+
+                if (optional.isPresent()) {
+                    Potion potion = optional.get().get();
+                    boolean splashed = false;
+                    List<MobEffectInstance> effects = Util.copyWithDuration(potion.getEffects(), duration -> duration / 4);
+
+                    for (MobEffectInstance effect : effects) {
+                        LivingEntity target = victim == null ? attacker : victim;
+                        if (!target.canBeAffected(effect)) {
+                            continue;
+                        }
+                        target.addEffect(effect);
+
+                        if (!splashed) {
+                            splashed = true;
+
+                            level.levelEvent(
+                                    LevelEvent.PARTICLES_SPELL_POTION_SPLASH,
+                                    (victim == null ? attacker : victim).blockPosition(),
+                                    PotionUtils.getColor(potion)
+                            );
+                        }
+
+                        if (attacker instanceof ServerPlayer serverPlayer) {
+                            serverPlayer.sendSystemMessage(
+                                    Component.translatable(
+                                            "ability.swordinthestone.alchemist." + (victim == null ? "self" : "victim"),
+                                            getPotionMessage(effect)
+                                    ).withStyle(SwordAbilities.ALCHEMIST.get().getColorStyle()),
+                                    effects.size() == 1
+                            );
+                        }
+                    }
+
+                    if (splashed) return;
+                }
+            }
+        }
+    }
+
+    private static MutableComponent getPotionMessage(MobEffectInstance effect) {
+        Component potionName = Component.translatable(effect.getDescriptionId());
+        int duration = effect.getDuration() / 20;
+
+        MutableComponent potionMessage;
+        if (effect.getAmplifier() > 0) {
+            potionMessage = Component.translatable("ability.swordinthestone.alchemist.potionAmplifier",
+                    potionName,
+                    Component.translatable("potion.potency." + effect.getAmplifier()),
+                    duration);
+        } else {
+            potionMessage = Component.translatable("ability.swordinthestone.alchemist.potion",
+                    potionName,
+                    duration);
+        }
+
+        return potionMessage.withStyle(Style.EMPTY.withColor(effect.getEffect().getColor()));
+    }
 
     // Bat Swarm
     public static final int BAT_SWARM_COOLDOWN = 200;

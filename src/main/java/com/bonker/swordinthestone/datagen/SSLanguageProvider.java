@@ -32,6 +32,8 @@ public class SSLanguageProvider extends LanguageProvider {
 
         add("ability.swordinthestone.alchemist.victim", "Alchemist: Inflicted victim with %s");
         add("ability.swordinthestone.alchemist.self", "Alchemist: Applied %s to self");
+        add("ability.swordinthestone.alchemist.potion", "%s (%ds)");
+        add("ability.swordinthestone.alchemist.potionAmplifier", "%s %s (%ds)");
         add("ability.swordinthestone.bat_swarm.name", "%s's %s");
     }
 

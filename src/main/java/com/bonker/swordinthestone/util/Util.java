@@ -3,6 +3,7 @@ package com.bonker.swordinthestone.util;
 import com.bonker.swordinthestone.SwordInTheStone;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
@@ -65,8 +66,8 @@ public class Util {
         return new Vec3(f3 * f4, -f5, f2 * f4);
     }
 
-    public static MobEffectInstance copyWithDuration(MobEffectInstance effect, int duration) {
-        return new MobEffectInstance(effect.getEffect(), duration, effect.getAmplifier(), effect.isAmbient(), effect.isVisible(), effect.showIcon());
+    public static List<MobEffectInstance> copyWithDuration(List<MobEffectInstance> effects, Int2IntFunction durationMapper) {
+        return effects.stream().map(effect -> new MobEffectInstance(effect.getEffect(), effect.mapDuration(durationMapper), effect.getAmplifier())).toList();
     }
 
     public static float[] diffuseColor(int rgb) {
