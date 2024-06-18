@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.command;
 
+import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -12,11 +13,12 @@ import net.minecraft.world.item.ItemStack;
 
 public class SSCommands {
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
-        pDispatcher.register(Commands.literal("sword")
+        pDispatcher.register(Commands.literal(SwordInTheStone.MODID)
                 .requires(stack -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(Commands.argument("num", IntegerArgumentType.integer(1, 100))
-                        .executes(SSCommands::makeSword))
-                .executes(SSCommands::makeSword));
+                .then(Commands.literal("sword")
+                        .then(Commands.argument("num", IntegerArgumentType.integer(1, 100))
+                                .executes(SSCommands::makeSword))
+                        .executes(SSCommands::makeSword)));
     }
 
     private static int makeSword(CommandContext<CommandSourceStack> context) {
