@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.entity;
 
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.networking.ClientboundSyncDeltaPacket;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
 import net.minecraft.core.particles.ParticleTypes;
@@ -27,7 +28,7 @@ public class BatSwarmGoal extends Goal {
         this.bat = bat;
         this.swarm = swarm;
         this.isLeader = isLeader;
-        this.lifetime = 55 + Math.round(bat.getRandom().nextFloat() * 10);
+        this.lifetime = SSConfig.BAT_SWARM_DURATION.get() - 5 + Math.round(bat.getRandom().nextFloat() * 10);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class BatSwarmGoal extends Goal {
         bat.level().getEntities(bat, bat.getBoundingBox().inflate(0.5), entity -> !(entity instanceof Bat)).forEach(entity -> {
             if (entity != swarm.owner && entity instanceof LivingEntity livingEntity) {
                 livingEntity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100));
-                entity.hurt(livingEntity.level().damageSources().mobAttack(bat), 2F);
+                entity.hurt(livingEntity.level().damageSources().mobAttack(bat), SSConfig.BAT_SWARM_DAMAGE.get().floatValue());
                 entity.setDeltaMovement(swarm.hitDelta);
                 if (entity instanceof ServerPlayer player) {
                     SSNetworking.sendToPlayer(new ClientboundSyncDeltaPacket(entity.getDeltaMovement()), player);

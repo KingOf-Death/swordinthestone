@@ -110,7 +110,11 @@ public class CommonEvents {
                 cap.setDashTicks(dashTicks);
             });
 
-            if (player.onGround()) {
+            if (player.getVehicle() == null || !SSConfig.DOUBLE_JUMP_VEHICLE.get()) {
+                if (player.onGround()) {
+                    player.getCapability(ExtraJumpsCapability.JUMPS).ifPresent(IExtraJumpsCapability::resetExtraJumps);
+                }
+            } else if (player.getVehicle().onGround() && player.level().getGameTime() % 5 == 0) {
                 player.getCapability(ExtraJumpsCapability.JUMPS).ifPresent(IExtraJumpsCapability::resetExtraJumps);
             }
         }

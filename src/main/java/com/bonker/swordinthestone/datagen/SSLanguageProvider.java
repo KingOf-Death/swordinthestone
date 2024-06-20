@@ -22,7 +22,7 @@ public class SSLanguageProvider extends LanguageProvider {
         addEntityType(SSEntityTypes.SPELL_FIREBALL, "Fireball");
 
         add(SwordAbilities.THUNDER_SMITE.get(), "Thunder Smite", "Thundering %s", "Sword charges when attacking mobs\nStrikes mobs with lightning when fully charged");
-        add(SwordAbilities.VAMPIRIC.get(), "Life Steal", "Vampiric %s", "Steal some of an enemy's health upon killing it\n(Capped at 5 hearts)");
+        add(SwordAbilities.VAMPIRIC.get(), "Life Steal", "Vampiric %s", "Steal some of an enemy's health upon killing it");
         add(SwordAbilities.TOXIC_DASH.get(), "Toxic Dash", "Toxic %s", "Slash forward on right click leaving behind a poisonous cloud");
         add(SwordAbilities.ENDER_RIFT.get(), "Ender Rift", "Unstable %s", "Hold right click and move your mouse to move an orb\nRelease to teleport to the orb");
         add(SwordAbilities.FIREBALL.get(), "Fireball", "Flaming %s", "Hold right click to charge up a fireball attack");
@@ -35,6 +35,30 @@ public class SSLanguageProvider extends LanguageProvider {
         add("ability.swordinthestone.alchemist.potion", "%s (%ds)");
         add("ability.swordinthestone.alchemist.potionAmplifier", "%s %s (%ds)");
         add("ability.swordinthestone.bat_swarm.name", "%s's %s");
+
+        addConfig("disabledAbilities", "Disabled Sword Abilities");
+        addConfig("baseDamage", "Base Sword Damage");
+        addConfig("maxDamageModifier", "Max Sword Damage Modifier");
+        addConfig("baseAttackSpeed", "Base Sword Attack Speed");
+        addConfig("maxAttackSpeedModifier", "Max Attack Speed Modifier");
+        addConfig("durability", "Sword Durability");
+        addConfig("thunderSmiteCharges", "Thunder Smite Charges");
+        addConfig("vampiricHealthPercent", "Vampiric Life Steal Percent");
+        addConfig("vampiricHealthCap", "Vampiric Life Steal Cap");
+        addConfig("toxicDashCooldown", "Toxic Dash Cooldown");
+        addConfig("enderRiftCooldown", "Ender Rift Cooldown");
+        addConfig("enderRiftDuration", "Ender Rift Projectile Duration");
+        addConfig("fireballCooldown", "Fireball Cooldown");
+        addConfig("fireballDestroyBlocks", "Ability Fireballs Destroy Blocks");
+        addConfig("fireballSetFire", "Ability Fireballs Create Fire");
+        addConfig("fireballMaxPower", "Max Fireball Explosion Power");
+        addConfig("fireballChargeRate", "Fireball Power Charge Rate");
+        addConfig("doubleJumpVehicle", "Double Jump While Riding");
+        addConfig("alchemistSelfChance", "Alchemist Splash Self Chance");
+        addConfig("alchemistVictimChance", "Alchemist Splash Victim Chance");
+        addConfig("batSwarmCooldown", "Bat Swarm Cooldown");
+        addConfig("batSwarmDuration", "Bat Swarm Duration");
+        addConfig("batSwarmDamage", "Bat Swarm Attack Damage");
     }
 
     private void add(SwordAbility key, String name, String title, String description) {
@@ -44,5 +68,9 @@ public class SSLanguageProvider extends LanguageProvider {
             add("ability." + loc.getNamespace() + "." + loc.getPath() + ".title", title);
             add("ability." + loc.getNamespace() + "." + loc.getPath() + ".description", description);
         }
+    }
+
+    private void addConfig(String path, String name) {
+        add("swordinthestone.configgui." + path, name);
     }
 }

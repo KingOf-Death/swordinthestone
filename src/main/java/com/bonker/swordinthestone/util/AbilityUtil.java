@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 public class AbilityUtil {
     public static SwordAbility getSwordAbility(LivingEntity holder) {
@@ -47,11 +48,11 @@ public class AbilityUtil {
         stack.getOrCreateTag().putLong("lastUsedTick", level.getGameTime());
     }
 
-    public static boolean showCooldownBar(ItemStack stack, int cooldownLength) {
-        return isOnCooldown(stack, null, cooldownLength);
+    public static boolean showCooldownBar(ItemStack stack, Supplier<Integer> cooldownSupplier) {
+        return isOnCooldown(stack, null, cooldownSupplier.get());
     }
 
-    public static int cooldownProgress(ItemStack stack, int cooldownLength) {
-        return AbilityUtil.barProgress((int) SideUtil.getTimeSinceTick(null, stack.getOrCreateTag().getInt("lastUsedTick")), cooldownLength);
+    public static int cooldownProgress(ItemStack stack, Supplier<Integer> cooldownSupplier) {
+        return AbilityUtil.barProgress((int) SideUtil.getTimeSinceTick(null, stack.getOrCreateTag().getInt("lastUsedTick")), cooldownSupplier.get());
     }
 }

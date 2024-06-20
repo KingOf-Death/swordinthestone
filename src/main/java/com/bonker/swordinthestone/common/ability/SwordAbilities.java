@@ -3,6 +3,7 @@ package com.bonker.swordinthestone.common.ability;
 import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.common.SSAttributes;
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.SSSounds;
 import com.bonker.swordinthestone.common.capability.DashCapability;
 import com.bonker.swordinthestone.common.entity.BatSwarmGoal;
@@ -65,7 +66,7 @@ public class SwordAbilities {
                         int charge = stack.getOrCreateTag().getInt("charge");
                         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, victim.getX(), victim.getY() + 1.0, victim.getZ(), 20, 0.7, 1, 0.7, 0.4);
                         level.playSound(null, holder.getX(), holder.getY(), holder.getZ(), SSSounds.ZAP.get(), SoundSource.PLAYERS, 2.0F, 2.0F - charge * 0.5F);
-                        if (++charge > 3) {
+                        if (++charge > SSConfig.THUNDER_SMITE_CHARGES.get()) {
                             LightningBolt bolt = EntityType.LIGHTNING_BOLT.spawn(level, null, entity -> {
                                 entity.setVisualOnly(true);
                                 if (holder instanceof ServerPlayer serverPlayer) entity.setCause(serverPlayer);
@@ -81,25 +82,24 @@ public class SwordAbilities {
                         }
                         stack.getOrCreateTag().putInt("charge", charge);
                     })
-                    .hasGlint(stack -> stack.getOrCreateTag().getInt("charge") >= 3)
+                    .hasGlint(stack -> stack.getOrCreateTag().getInt("charge") >= SSConfig.THUNDER_SMITE_CHARGES.get())
                     .build());
     // Vampiric
     public static final RegistryObject<SwordAbility> VAMPIRIC = register("vampiric",
             () -> new SwordAbilityBuilder(0xe20028)
                     .onKill((level, holder, victim) -> {
-                        float healing = Mth.clamp(victim.getMaxHealth() * 0.2F, 1, 10);
+                        float healing = Mth.clamp(victim.getMaxHealth() * SSConfig.VAMPIRIC_HEALTH_PERCENT.get().floatValue(), 1, SSConfig.VAMPIRIC_HEALTH_CAP.get());
                         int particles = Mth.clamp(Math.round(healing * 3), 4, 20);
                         holder.heal(healing);
                         level.sendParticles(SSParticles.HEAL.get(), victim.getX(), victim.getY() + victim.getBbHeight() * 0.5, victim.getZ(), particles, victim.getBbWidth() * 0.2, victim.getBbHeight() * 0.2, victim.getBbWidth() * 0.2, 0);
                     })
                     .build());
     // Toxic Dash
-    public static final int TOXIC_DASH_COOLDOWN = 200;
     public static final RegistryObject<SwordAbility> TOXIC_DASH = register("toxic_dash",
             () -> new SwordAbilityBuilder(0x52c539)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-                        if (AbilityUtil.isOnCooldown(stack, level, TOXIC_DASH_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.TOXIC_DASH_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                         level.playSound(player, player.getX(), player.getY(), player.getZ(), SSSounds.DASH.get(), SoundSource.PLAYERS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
                         level.playSound(player, player.getX(), player.getY(), player.getZ(), SSSounds.TOXIC.get(), SoundSource.PLAYERS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
@@ -121,17 +121,15 @@ public class SwordAbilities {
                         AbilityUtil.setOnCooldown(stack, level);
                         return InteractionResultHolder.success(stack);
                     })
-                    .addCooldown(TOXIC_DASH_COOLDOWN)
+                    .addCooldown(SSConfig.TOXIC_DASH_COOLDOWN)
                     .build());
 
     // Ender Rift
-    public static final int ENDER_RIFT_DURATION = 60;
-    public static final int ENDER_RIFT_COOLDOWN = 200; // must be more than the duration
     public static final RegistryObject<SwordAbility> ENDER_RIFT = register("ender_rift",
             () -> new SwordAbilityBuilder(0xe434ff)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-                        if (AbilityUtil.isOnCooldown(stack, level, ENDER_RIFT_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.ENDER_RIFT_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                         if (!level.isClientSide) {
                             EnderRift enderRift = new EnderRift(level, player);
@@ -143,10 +141,10 @@ public class SwordAbilities {
                         return InteractionResultHolder.pass(stack);
                     })
                     .onReleaseUsing((stack, level, entity, ticks) -> {
-                        if (AbilityUtil.isOnCooldown(stack, level, ENDER_RIFT_COOLDOWN)) return;
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.ENDER_RIFT_COOLDOWN.get())) return;
 
                         if (!level.isClientSide) {
-                            if (ENDER_RIFT_DURATION - ticks > 4) {
+                            if (SSConfig.ENDER_RIFT_DURATION.get() - ticks > 4) {
                                 Util.getOwnedProjectiles(entity, EnderRift.class, (ServerLevel) level).forEach(EnderRift::teleport);
                             } else {
                                 Util.getOwnedProjectiles(entity, EnderRift.class, (ServerLevel) level).forEach(e -> e.getEntityData().set(EnderRift.DATA_CONTROLLING, false));
@@ -155,18 +153,17 @@ public class SwordAbilities {
 
                         AbilityUtil.setOnCooldown(stack, level);
                     })
-                    .useDuration(ENDER_RIFT_DURATION)
-                    .addCooldown(ENDER_RIFT_COOLDOWN)
+                    .useDuration(SSConfig.ENDER_RIFT_DURATION.get())
+                    .addCooldown(SSConfig.ENDER_RIFT_COOLDOWN)
                     .useAnimation(UseAnim.BLOCK)
                     .build());
 
     // Fireball
-    public static final int FIREBALL_COOLDOWN = 120;
     public static final RegistryObject<SwordAbility> FIREBALL = register("fireball",
             () -> new SwordAbilityBuilder(0xff4b25)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-                        if (AbilityUtil.isOnCooldown(stack, level, FIREBALL_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.FIREBALL_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                         if (!level.isClientSide) {
                             SpellFireball fireball = new SpellFireball(level, player);
@@ -184,7 +181,7 @@ public class SwordAbilities {
                         AbilityUtil.setOnCooldown(stack, level);
                     })
                     .useDuration(72000)
-                    .addCooldown(FIREBALL_COOLDOWN)
+                    .addCooldown(SSConfig.FIREBALL_COOLDOWN)
                     .useAnimation(UseAnim.BOW)
                     .build());
 
@@ -217,7 +214,7 @@ public class SwordAbilities {
             .build());
 
     public static void handleAlchemistAbility(Level level, LivingEntity attacker, @Nullable LivingEntity victim) {
-        float chance = victim == null ? 0.5F : 0.5F;
+        float chance = (victim == null ? SSConfig.ALCHEMIST_SELF_CHANCE : SSConfig.ALCHEMIST_VICTIM_CHANCE).get().floatValue();
         if (level.random.nextFloat() <= chance) {
             for (int tries = 0; tries < 3; tries++) {
                 Optional<Holder<Potion>> optional = level.registryAccess().registryOrThrow(Registries.POTION)
@@ -283,12 +280,11 @@ public class SwordAbilities {
     }
 
     // Bat Swarm
-    public static final int BAT_SWARM_COOLDOWN = 200;
     public static final RegistryObject<SwordAbility> BAT_SWARM = register("bat_swarm",
             () -> new SwordAbilityBuilder(0xab29ff)
             .onUse((level, player, usedHand) -> {
                 ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                if (AbilityUtil.isOnCooldown(stack, level, BAT_SWARM_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                if (AbilityUtil.isOnCooldown(stack, level, SSConfig.BAT_SWARM_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                 if (!level.isClientSide) {
                     Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(0.9));
@@ -308,7 +304,7 @@ public class SwordAbilities {
                 AbilityUtil.setOnCooldown(stack, level);
                 return InteractionResultHolder.success(stack);
             })
-            .addCooldown(BAT_SWARM_COOLDOWN)
+            .addCooldown(SSConfig.BAT_SWARM_COOLDOWN)
             .build());
 
 

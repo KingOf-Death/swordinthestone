@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class SwordAbilityBuilder {
     private final int color;
@@ -86,9 +87,9 @@ public class SwordAbilityBuilder {
         return this;
     }
 
-    public SwordAbilityBuilder addCooldown(int time) {
-        return customBar(stack -> AbilityUtil.showCooldownBar(stack, time),
-                stack -> AbilityUtil.cooldownProgress(stack, time),
+    public SwordAbilityBuilder addCooldown(Supplier<Integer> cooldownSupplier) {
+        return customBar(stack -> AbilityUtil.showCooldownBar(stack, cooldownSupplier),
+                stack -> AbilityUtil.cooldownProgress(stack, cooldownSupplier),
                 null);
     }
 

@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -99,6 +100,15 @@ public class Util {
     
     public static <T> TagKey<T> makeTag(ResourceKey<Registry<T>> registryKey, String path) {
         return TagKey.create(registryKey, Util.makeResource(path));
+    }
+
+    public static float randomFloatMultiple(RandomSource random, float max, float base) {
+        if (max % base > 0.001) {
+            return random.nextFloat() * max;
+        }
+
+        int intervals = Mth.floor(max / base);
+        return base * random.nextInt(intervals + 1);
     }
 
     public static class SwordSpinAnimation {

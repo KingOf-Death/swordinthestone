@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.entity;
 
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.networking.ClientboundEnderRiftPacket;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
 import com.bonker.swordinthestone.util.SideUtil;
@@ -43,7 +44,7 @@ public class EnderRift extends Projectile {
     public void tick() {
         super.tick();
 
-        if (++age >= 60) {
+        if (++age >= SSConfig.ENDER_RIFT_DURATION.get()) {
             teleport();
         }
 

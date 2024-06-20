@@ -1,6 +1,7 @@
 package com.bonker.swordinthestone.common.entity;
 
 import com.bonker.swordinthestone.client.particle.SSParticles;
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.SSSounds;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -49,10 +50,13 @@ public class SpellFireball extends Fireball {
             lerpTo(pos.x(), pos.y() - 0.5, pos.z(), getXRot(), getYRot(), 6, false);
         }
 
-        if (getPower() <= 2.0F) {
-            addPower(0.08F);
-        } else if (getPower() <= 4.0F) {
-            addPower(0.04F);
+        float maxPower = SSConfig.FIREBALL_MAX_POWER.get().floatValue();
+        float chargeRate = SSConfig.FIREBALL_CHARGE_RATE.get().floatValue();
+
+        if (getPower() <= maxPower / 2) {
+            addPower(chargeRate * 2);
+        } else if (getPower() <= maxPower) {
+            addPower(chargeRate);
         } else if (!level().isClientSide) {
             ((ServerLevel) level()).sendParticles(ParticleTypes.SMOKE, getX(), getY() + 0.5, getZ(), 8, 0, 0, 0, 0.1F);
         }
@@ -82,7 +86,7 @@ public class SpellFireball extends Fireball {
                 if (!isInvulnerable) owner.setInvulnerable(true);
             }
 
-            level().explode(this, getX(), getY() + 0.5, getZ(), getPower(), true, Level.ExplosionInteraction.BLOCK);
+            level().explode(this, getX(), getY() + 0.5, getZ(), getPower(), SSConfig.FIREBALL_SET_FIRE.get(), SSConfig.FIREBALL_DESTROY_BLOCKS.get() ? Level.ExplosionInteraction.BLOCK : Level.ExplosionInteraction.NONE);
 
             // remove owner invulnerability
             if (owner != null && !isInvulnerable) owner.setInvulnerable(false);
