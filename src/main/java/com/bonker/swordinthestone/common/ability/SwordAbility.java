@@ -55,8 +55,6 @@ public abstract class SwordAbility {
 
     public int getBarWidth(ItemStack pStack) {return 0;}
 
-    public int getBarColor(ItemStack pStack) {return color.getValue();}
-
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {}
 
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int ticks) {}

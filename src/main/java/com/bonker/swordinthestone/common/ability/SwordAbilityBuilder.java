@@ -24,7 +24,7 @@ public class SwordAbilityBuilder {
     private HitAction onHit, onKill;
     private UseAction onUse;
     private Function<ItemStack, Boolean> hasGlint, showBar;
-    private Function<ItemStack, Integer> barWidth, barColor;
+    private Function<ItemStack, Integer> barWidth;
     private TickAction inventoryTick;
     private ReleaseAction onRelease;
     private int useDuration = 0;
@@ -55,10 +55,9 @@ public class SwordAbilityBuilder {
         return this;
     }
 
-    public SwordAbilityBuilder customBar(Function<ItemStack, Boolean> showBar, Function<ItemStack, Integer> barWidth, Function<ItemStack, Integer> barColor) {
+    public SwordAbilityBuilder customBar(Function<ItemStack, Boolean> showBar, Function<ItemStack, Integer> barWidth) {
         this.showBar = showBar;
         this.barWidth = barWidth;
-        this.barColor = barColor;
         return this;
     }
 
@@ -89,19 +88,19 @@ public class SwordAbilityBuilder {
 
     public SwordAbilityBuilder addCooldown(Supplier<Integer> cooldownSupplier) {
         return customBar(stack -> AbilityUtil.showCooldownBar(stack, cooldownSupplier),
-                stack -> AbilityUtil.cooldownProgress(stack, cooldownSupplier),
-                null);
+                stack -> AbilityUtil.cooldownProgress(stack, cooldownSupplier)
+        );
     }
 
     public SwordAbility build() {
-        return new SwordAbilityImpl(color, onHit, onKill, onUse, hasGlint, showBar, barWidth, barColor, inventoryTick, onRelease, useDuration, useAnim, attributes);
+        return new SwordAbilityImpl(color, onHit, onKill, onUse, hasGlint, showBar, barWidth, inventoryTick, onRelease, useDuration, useAnim, attributes);
     }
 
     private static class SwordAbilityImpl extends SwordAbility {
         private final HitAction onHit, onKill;
         private final UseAction onUse;
         private final Function<ItemStack, Boolean> hasGlint, showBar;
-        private final Function<ItemStack, Integer> barWidth, barColor;
+        private final Function<ItemStack, Integer> barWidth;
         private final TickAction inventoryTick;
         private final ReleaseAction onRelease;
         private final int useDuration;
@@ -111,9 +110,8 @@ public class SwordAbilityBuilder {
         private SwordAbilityImpl(int color, @Nullable HitAction onHit, @Nullable HitAction onKill,
                                  @Nullable UseAction onUse, @Nullable Function<ItemStack, Boolean> hasGlint,
                                  @Nullable Function<ItemStack, Boolean> showBar, @Nullable Function<ItemStack, Integer> barWidth,
-                                 @Nullable Function<ItemStack, Integer> barColor, @Nullable TickAction inventoryTick,
-                                 @Nullable ReleaseAction onRelease, int useDuration, UseAnim useAnim,
-                                 Multimap<Attribute, AttributeModifier> attributes) {
+                                 @Nullable TickAction inventoryTick, @Nullable ReleaseAction onRelease,
+                                 int useDuration, UseAnim useAnim, Multimap<Attribute, AttributeModifier> attributes) {
             super(color);
             this.onHit = onHit;
             this.onKill = onKill;
@@ -121,7 +119,6 @@ public class SwordAbilityBuilder {
             this.hasGlint = hasGlint;
             this.showBar = showBar;
             this.barWidth = barWidth;
-            this.barColor = barColor;
             this.inventoryTick = inventoryTick;
             this.onRelease = onRelease;
             this.useDuration = useDuration;
@@ -161,12 +158,6 @@ public class SwordAbilityBuilder {
         public int getBarWidth(ItemStack stack) {
             if (barWidth != null) return barWidth.apply(stack);
             return super.getBarWidth(stack);
-        }
-
-        @Override
-        public int getBarColor(ItemStack stack) {
-            if (barColor != null) return barColor.apply(stack);
-            return super.getBarColor(stack);
         }
 
         @Override
