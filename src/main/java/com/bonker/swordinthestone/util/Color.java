@@ -1,28 +1,48 @@
 package com.bonker.swordinthestone.util;
 
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.FastColor;
 
 public class Color {
-    private final int color;
-    private Style style;
-    private float[] diffusedColor;
+    private static final int DARKEN = 0xFF383838;
 
-    public Color(int color) {
-        this.color = color;
+    private final int value, argbcolor, bgcolor;
+    private final Style style;
+    private final float[] diffusedColor;
+
+    public Color(int value) {
+        this.value = value;
+        this.argbcolor = value | 0xFF000000;
+        this.bgcolor = FastColor.ARGB32.multiply(argbcolor, DARKEN);
+        this.style = Style.EMPTY.withColor(value);
+        this.diffusedColor = diffuseColor(value);
     }
 
-    public int getIntColor() {
-        return color;
+    public int getValue() {
+        return value;
+    }
+
+    public int getARGB() {
+        return argbcolor;
+    }
+
+    public int getBG() {
+        return bgcolor;
     }
 
     public Style getStyle() {
-        if (style == null) style = Style.EMPTY.withColor(color);
         return style;
     }
 
     public float[] getDiffusedColor() {
-        if (diffusedColor == null) diffusedColor = Util.diffuseColor(color);
         return diffusedColor;
+    }
+
+    public static float[] diffuseColor(int rgb) {
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+        return new float[] {r / 255F, g / 255F, b / 255F};
     }
 
     public static Color uniqueSwordColor(int abilityRGB, int swordRGB) {

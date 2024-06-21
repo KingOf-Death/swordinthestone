@@ -29,8 +29,8 @@ public abstract class SwordAbility {
         this.color = new Color(color);
     }
 
-    public int getColor() {
-        return color.getIntColor();
+    public Color getColor() {
+        return color;
     }
 
     public Style getColorStyle() {
@@ -55,7 +55,7 @@ public abstract class SwordAbility {
 
     public int getBarWidth(ItemStack pStack) {return 0;}
 
-    public int getBarColor(ItemStack pStack) {return color.getIntColor();}
+    public int getBarColor(ItemStack pStack) {return color.getValue();}
 
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {}
 

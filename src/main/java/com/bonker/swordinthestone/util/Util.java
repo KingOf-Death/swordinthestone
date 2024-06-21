@@ -71,13 +71,6 @@ public class Util {
         return effects.stream().map(effect -> new MobEffectInstance(effect.getEffect(), effect.mapDuration(durationMapper), effect.getAmplifier())).toList();
     }
 
-    public static float[] diffuseColor(int rgb) {
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = rgb & 0xFF;
-        return new float[] {r / 255F, g / 255F, b / 255F};
-    }
-
     public static List<BlockPos> betweenClosed(BlockPos firstPos, BlockPos secondPos) {
         ImmutableList.Builder<BlockPos> builder = ImmutableList.builder();
         for (BlockPos blockPos : BlockPos.betweenClosed(firstPos, secondPos)) {

@@ -84,6 +84,7 @@ public class SwordAbilities {
                     })
                     .hasGlint(stack -> stack.getOrCreateTag().getInt("charge") >= SSConfig.THUNDER_SMITE_CHARGES.get())
                     .build());
+
     // Vampiric
     public static final RegistryObject<SwordAbility> VAMPIRIC = register("vampiric",
             () -> new SwordAbilityBuilder(0xe20028)
@@ -94,6 +95,7 @@ public class SwordAbilities {
                         level.sendParticles(SSParticles.HEAL.get(), victim.getX(), victim.getY() + victim.getBbHeight() * 0.5, victim.getZ(), particles, victim.getBbWidth() * 0.2, victim.getBbHeight() * 0.2, victim.getBbWidth() * 0.2, 0);
                     })
                     .build());
+
     // Toxic Dash
     public static final RegistryObject<SwordAbility> TOXIC_DASH = register("toxic_dash",
             () -> new SwordAbilityBuilder(0x52c539)

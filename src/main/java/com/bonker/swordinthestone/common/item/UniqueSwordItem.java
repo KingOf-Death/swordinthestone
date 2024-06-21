@@ -140,25 +140,6 @@ public class UniqueSwordItem extends SwordItem {
     }
 
     @Override
-    public boolean isBarVisible(ItemStack pStack) {
-        return AbilityUtil.getSwordAbility(pStack).isBarVisible(pStack) || super.isBarVisible(pStack);
-    }
-
-    @Override
-    public int getBarWidth(ItemStack pStack) {
-        SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
-        if (ability.isBarVisible(pStack)) return ability.getBarWidth(pStack);
-        return super.getBarWidth(pStack);
-    }
-
-    @Override
-    public int getBarColor(ItemStack pStack) {
-        SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
-        if (ability.isBarVisible(pStack)) return ability.getBarColor(pStack);
-        return super.getBarColor(pStack);
-    }
-
-    @Override
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
         AbilityUtil.getSwordAbility(pStack).inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
     }

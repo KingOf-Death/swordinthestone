@@ -1,6 +1,7 @@
 package com.bonker.swordinthestone.common;
 
 import com.bonker.swordinthestone.SwordInTheStone;
+import com.bonker.swordinthestone.client.gui.SSItemDecorator;
 import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
@@ -35,6 +36,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -184,7 +186,7 @@ public class CommonEvents {
             for (RegistryObject<Item> itemObj : SSItems.ITEMS.getEntries()) {
                 if (itemObj.get() instanceof UniqueSwordItem uniqueSwordItem) {
                     for (RegistryObject<SwordAbility> abilityObj : SwordAbilities.SWORD_ABILITIES.getEntries()) {
-                        UniqueSwordItem.STYLE_TABLE.put(uniqueSwordItem, abilityObj.get(), Color.uniqueSwordColor(abilityObj.get().getColor(), uniqueSwordItem.getColor()));
+                        UniqueSwordItem.STYLE_TABLE.put(uniqueSwordItem, abilityObj.get(), Color.uniqueSwordColor(abilityObj.get().getColor().getValue(), uniqueSwordItem.getColor()));
                     }
                 }
             }
@@ -194,6 +196,15 @@ public class CommonEvents {
         @SubscribeEvent
         public static void onAttributeModification(final EntityAttributeModificationEvent event) {
             event.add(EntityType.PLAYER, SSAttributes.JUMPS.get(), 0);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event) {
+            for (RegistryObject<Item> obj : SSItems.ITEMS.getEntries()) {
+                if (obj.get() instanceof UniqueSwordItem) {
+                    event.register(obj.get(), SSItemDecorator.ITEM_DECORATOR);
+                }
+            }
         }
     }
 }
