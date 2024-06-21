@@ -1,4 +1,4 @@
-package com.bonker.swordinthestone.common.command;
+package com.bonker.swordinthestone.server.command;
 
 import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;

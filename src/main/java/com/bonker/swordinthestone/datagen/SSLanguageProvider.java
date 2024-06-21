@@ -36,12 +36,22 @@ public class SSLanguageProvider extends LanguageProvider {
         add("ability.swordinthestone.alchemist.potionAmplifier", "%s %s (%ds)");
         add("ability.swordinthestone.bat_swarm.name", "%s's %s");
 
-        addConfig("disabledAbilities", "Disabled Sword Abilities");
+        // sword stats
         addConfig("baseDamage", "Base Sword Damage");
         addConfig("maxDamageModifier", "Max Sword Damage Modifier");
         addConfig("baseAttackSpeed", "Base Sword Attack Speed");
         addConfig("maxAttackSpeedModifier", "Max Attack Speed Modifier");
         addConfig("durability", "Sword Durability");
+        // sword stone
+        addConfig("swordBeaconEnabled", "Enable Sword Stone Periodic Beacon Beam");
+        addConfig("disabledAbilities", "Disabled Sword Abilities");
+        addConfig("swordStoneSpacingOverworld", "Overworld Sword Stone Generation Spacing");
+        addConfig("swordStoneSeparationOverworld", "Overworld Sword Stone Generation Separation");
+        addConfig("swordStoneSpacingEnd", "End Sword Stone Generation Spacing");
+        addConfig("swordStoneSeparationEnd", "End Sword Stone Generation Separation");
+        addConfig("swordStoneSpacingNether", "Nether Sword Stone Generation Spacing");
+        addConfig("swordStoneSeparationNether", "Nether Sword Stone Generation Separation");
+        // abilities
         addConfig("thunderSmiteCharges", "Thunder Smite Charges");
         addConfig("vampiricHealthPercent", "Vampiric Life Steal Percent");
         addConfig("vampiricHealthCap", "Vampiric Life Steal Cap");

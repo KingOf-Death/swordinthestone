@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.block.entity;
 
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.SSSounds;
 import com.bonker.swordinthestone.common.block.SSBlocks;
 import com.bonker.swordinthestone.common.block.SwordStoneBlock;
@@ -140,20 +141,22 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
             entity.progress = 0;
         }
 
-        if (entity.isIdle()) {
-            entity.idleTicks++;
+        if (SSConfig.SWORD_BEACON_ENABLED.get()) {
+            if (entity.isIdle()) {
+                entity.idleTicks++;
 
-            if (!level.isClientSide) {
-                if (entity.idleTicks >= BEACON_ANIMATION_CYCLE) {
-                    entity.idleTicks = 0;
+                if (!level.isClientSide) {
+                    if (entity.idleTicks >= BEACON_ANIMATION_CYCLE) {
+                        entity.idleTicks = 0;
 
-                    SSNetworking.sendToClientsLoadingBE(new ClientboundSyncSwordStoneDataPacket(blockPos, false, (short) 0), entity);
+                        SSNetworking.sendToClientsLoadingBE(new ClientboundSyncSwordStoneDataPacket(blockPos, false, (short) 0), entity);
+                    }
+                } else if (entity.idleTicks == 75) {
+                    level.playLocalSound(entity.getBlockPos(), SSSounds.LASER.get(), SoundSource.BLOCKS, 4.5F, 0.6F + level.random.nextFloat() * 0.8F, false);
                 }
-            } else if (entity.idleTicks == 75) {
-                level.playLocalSound(entity.getBlockPos(), SSSounds.LASER.get(), SoundSource.BLOCKS, 4.5F, 0.6F + level.random.nextFloat() * 0.8F, false);
+            } else {
+                entity.idleTicks = 0;
             }
-        } else {
-            entity.idleTicks = 0;
         }
     }
 

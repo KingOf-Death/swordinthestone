@@ -1,7 +1,7 @@
 package com.bonker.swordinthestone.common.networking;
 
 import com.bonker.swordinthestone.common.SSConfig;
-import com.bonker.swordinthestone.common.capability.ExtraJumpsCapability;
+import com.bonker.swordinthestone.server.capability.ExtraJumpsCapability;
 import com.bonker.swordinthestone.util.DoubleJumpEvent;
 import com.bonker.swordinthestone.util.Util;
 import net.minecraft.network.FriendlyByteBuf;

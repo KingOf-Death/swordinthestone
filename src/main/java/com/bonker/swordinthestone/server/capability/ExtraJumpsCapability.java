@@ -1,4 +1,4 @@
-package com.bonker.swordinthestone.common.capability;
+package com.bonker.swordinthestone.server.capability;
 
 import com.bonker.swordinthestone.common.SSAttributes;
 import com.bonker.swordinthestone.util.Util;

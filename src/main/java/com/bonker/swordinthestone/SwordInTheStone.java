@@ -10,6 +10,7 @@ import com.bonker.swordinthestone.common.block.entity.SSBlockEntities;
 import com.bonker.swordinthestone.common.entity.SSEntityTypes;
 import com.bonker.swordinthestone.common.item.SSItems;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
+import com.bonker.swordinthestone.server.worldgen.SSWorldGen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -44,6 +45,7 @@ public class SwordInTheStone {
         SSParticles.PARTICLE_TYPES.register(bus);
         SSEntityTypes.ENTITY_TYPES.register(bus);
         SSAttributes.ATTRIBUTES.register(bus);
+        SSWorldGen.STRUCTURE_PLACEMENT_TYPES.register(bus);
         SSNetworking.register();
     }
 }

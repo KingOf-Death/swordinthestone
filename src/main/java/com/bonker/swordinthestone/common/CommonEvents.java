@@ -4,11 +4,6 @@ import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
-import com.bonker.swordinthestone.common.capability.DashCapability;
-import com.bonker.swordinthestone.common.capability.ExtraJumpsCapability;
-import com.bonker.swordinthestone.common.capability.ExtraJumpsProvider;
-import com.bonker.swordinthestone.common.capability.IExtraJumpsCapability;
-import com.bonker.swordinthestone.common.command.SSCommands;
 import com.bonker.swordinthestone.common.entity.BatSwarmGoal;
 import com.bonker.swordinthestone.common.entity.EnderRift;
 import com.bonker.swordinthestone.common.entity.HeightAreaEffectCloud;
@@ -16,6 +11,11 @@ import com.bonker.swordinthestone.common.item.SSItems;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
 import com.bonker.swordinthestone.common.networking.ServerboundDashAttackPacket;
+import com.bonker.swordinthestone.server.capability.DashCapability;
+import com.bonker.swordinthestone.server.capability.ExtraJumpsCapability;
+import com.bonker.swordinthestone.server.capability.ExtraJumpsProvider;
+import com.bonker.swordinthestone.server.capability.IExtraJumpsCapability;
+import com.bonker.swordinthestone.server.command.SSCommands;
 import com.bonker.swordinthestone.util.AbilityUtil;
 import com.bonker.swordinthestone.util.Color;
 import com.bonker.swordinthestone.util.DoubleJumpEvent;
@@ -33,6 +33,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -114,7 +115,7 @@ public class CommonEvents {
                 if (player.onGround()) {
                     player.getCapability(ExtraJumpsCapability.JUMPS).ifPresent(IExtraJumpsCapability::resetExtraJumps);
                 }
-            } else if (player.getVehicle().onGround() && player.level().getGameTime() % 5 == 0) {
+            } else if ((player.getVehicle().onGround() || player.getVehicle().getBlockStateOn().is(Blocks.WATER)) && player.level().getGameTime() % 5 == 0) {
                 player.getCapability(ExtraJumpsCapability.JUMPS).ifPresent(IExtraJumpsCapability::resetExtraJumps);
             }
         }

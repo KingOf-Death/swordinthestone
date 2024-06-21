@@ -15,23 +15,31 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber(modid = SwordInTheStone.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SSConfig {
     private static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec COMMON_CONFIG;
 
-    // generic
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> DISABLED_ABILITIES;
-    public static final List<ResourceLocation> disabledAbilities = new ArrayList<>();
+    // sword stats
     public static final ForgeConfigSpec.IntValue BASE_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue MAX_DAMAGE_MODIFIER;
     public static final ForgeConfigSpec.DoubleValue BASE_SPEED;
     public static final ForgeConfigSpec.DoubleValue MAX_SPEED_MODIFIER;
     public static final ForgeConfigSpec.IntValue DURABILITY;
 
-    // ability specific
+    // sword stone
+    public static final ForgeConfigSpec.BooleanValue SWORD_BEACON_ENABLED;
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> DISABLED_ABILITIES;
+    public static final List<ResourceLocation> disabledAbilities = new ArrayList<>();
+    public static final ForgeConfigSpec.IntValue SWORD_STONE_SPACING_OVERWORLD;
+    public static final ForgeConfigSpec.IntValue SWORD_STONE_SEPARATION_OVERWORLD;
+    public static final ForgeConfigSpec.IntValue SWORD_STONE_SPACING_END;
+    public static final ForgeConfigSpec.IntValue SWORD_STONE_SEPARATION_END;
+    public static final ForgeConfigSpec.IntValue SWORD_STONE_SPACING_NETHER;
+    public static final ForgeConfigSpec.IntValue SWORD_STONE_SEPARATION_NETHER;
+
+    // abilities
     public static final ForgeConfigSpec.IntValue THUNDER_SMITE_CHARGES;
     public static final ForgeConfigSpec.DoubleValue VAMPIRIC_HEALTH_PERCENT;
     public static final ForgeConfigSpec.IntValue VAMPIRIC_HEALTH_CAP;
@@ -51,16 +59,8 @@ public class SSConfig {
     public static final ForgeConfigSpec.DoubleValue BAT_SWARM_DAMAGE;
 
     static {
-        Predicate<Object> swordAbilityValidator = obj -> obj instanceof String str &&
-                ResourceLocation.isValidResourceLocation(str) &&
-                SwordAbilities.SWORD_ABILITY_REGISTRY.get().containsKey(new ResourceLocation(str));
-
-        // generic
-
-        DISABLED_ABILITIES = COMMON_BUILDER
-                .comment("Add the ids of sword abilities here to disabled them. Ex. \"swordinthestone:thunder_smite\"")
-                .translation("swordinthestone.configgui.disabledAbilities")
-                .defineListAllowEmpty("disabledAbilities", List.of(), swordAbilityValidator);
+        // sword stats
+        COMMON_BUILDER.comment("Sword Stats").push("stats");
 
         BASE_DAMAGE = COMMON_BUILDER
                 .comment("The base damage of a sword from this mod." +
@@ -94,7 +94,57 @@ public class SSConfig {
                 .translation("swordinthestone.configgui.durability")
                 .defineInRange("durability", 2000, 0, 10000);
 
-        // ability specific
+        // sword stone
+        COMMON_BUILDER.pop().comment("Sword Stone Settings").push("sword_stone");
+
+        SWORD_BEACON_ENABLED = COMMON_BUILDER
+                .comment("Whether sword stones should show a beacon beam every so often to alert players to their location.")
+                .translation("swordinthestone.configgui.swordBeaconEnabled")
+                .define("swordBeaconEnabled", true);
+
+        DISABLED_ABILITIES = COMMON_BUILDER
+                .comment("Add the ids of sword abilities here to disabled them. Ex. \"swordinthestone:thunder_smite\"")
+                .translation("swordinthestone.configgui.disabledAbilities")
+                .defineListAllowEmpty("disabledAbilities", List.of(), obj ->
+                        obj instanceof String str &&
+                                ResourceLocation.isValidResourceLocation(str) &&
+                                SwordAbilities.SWORD_ABILITY_REGISTRY.get().containsKey(new ResourceLocation(str)));
+
+        SWORD_STONE_SPACING_OVERWORLD = COMMON_BUILDER
+                .comment("The average distance (in chunks) between sword stones in the Overworld.")
+                .translation("swordinthestone.configgui.swordStoneSpacingOverworld")
+                .defineInRange("swordStoneSpacingOverworld", 40, 0, 4096);
+
+        SWORD_STONE_SEPARATION_OVERWORLD = COMMON_BUILDER
+                .comment("The minimum distance (in chunks) between sword stones in the Overworld." +
+                        "\nMust be smaller than swordStoneSpacingOverworld.")
+                .translation("swordinthestone.configgui.swordStoneSeparationOverworld")
+                .defineInRange("swordStoneSeparationOverworld", 15, 0, 4096);
+
+        SWORD_STONE_SPACING_END = COMMON_BUILDER
+                .comment("The average distance (in chunks) between sword stones in the End.")
+                .translation("swordinthestone.configgui.swordStoneSpacingEnd")
+                .defineInRange("swordStoneSpacingEnd", 40, 0, 4096);
+
+        SWORD_STONE_SEPARATION_END = COMMON_BUILDER
+                .comment("The minimum distance (in chunks) between sword stones in the End." +
+                        "\nMust be smaller than swordStoneSpacingEnd.")
+                .translation("swordinthestone.configgui.swordStoneSeparationEnd")
+                .defineInRange("swordStoneSeparationEnd", 15, 0, 4096);
+
+        SWORD_STONE_SPACING_NETHER = COMMON_BUILDER
+                .comment("The average distance (in chunks) between sword stones in the Nether.")
+                .translation("swordinthestone.configgui.swordStoneSpacingNether")
+                .defineInRange("swordStoneSpacingNether", 35, 0, 4096);
+
+        SWORD_STONE_SEPARATION_NETHER = COMMON_BUILDER
+                .comment("The minimum distance (in chunks) between sword stones in the Nether." +
+                        "\nMust be smaller than swordStoneSpacingNether.")
+                .translation("swordinthestone.configgui.swordStoneSeparationNether")
+                .defineInRange("swordStoneSeparationNether", 10, 0, 4096);
+
+        // abilities
+        COMMON_BUILDER.pop().comment("Sword Ability Settings").push("abilities");
 
         THUNDER_SMITE_CHARGES = COMMON_BUILDER
                 .comment("The number of hits with a Thunder Smite sword before the sword becomes electrically charged.")
@@ -156,9 +206,10 @@ public class SSConfig {
                 .defineInRange("fireballChargeRate", 0.04, 0.01, 1.0);
 
         DOUBLE_JUMP_VEHICLE = COMMON_BUILDER
-                .comment("Whether you can use the Double Jump ability while riding a vehicle.")
+                .comment("Whether you can use the Double Jump ability while riding a vehicle." +
+                        "\nThis feature is pretty buggy, but also pretty fun.")
                 .translation("swordinthestone.configgui.doubleJumpVehicle")
-                .define("doubleJumpVehicle", true);
+                .define("doubleJumpVehicle", false);
 
         ALCHEMIST_SELF_CHANCE = COMMON_BUILDER
                 .comment("The chance that you will receive a status effect upon killing a mob with the Alchemist abiliy.")

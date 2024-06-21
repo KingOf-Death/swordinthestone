@@ -36,7 +36,12 @@ public class ClientboundSyncDeltaPacket {
 
     public void handle() {
         if (Minecraft.getInstance().level == null) return;
-        Entity entity = entityId == -1 ? Minecraft.getInstance().player : Minecraft.getInstance().level.getEntity(entityId);
-        if (entity != null) entity.setDeltaMovement(new Vec3(xd, yd, zd));
+        if (entityId != -1) {
+            Entity entity = Minecraft.getInstance().level.getEntity(entityId);
+            if (entity != null) entity.setDeltaMovement(new Vec3(xd, yd, zd));
+        }
+        if (Minecraft.getInstance().player != null) {
+            Minecraft.getInstance().player.setDeltaMovement(new Vec3(xd, yd, zd));
+        }
     }
 }

@@ -6,9 +6,8 @@
     }
   ],
   "placement": {
-    "type": "minecraft:random_spread",
-    "spacing": 40,
-    "separation": 15,
+    "type": "swordinthestone:sword_stone_placement",
+    "sword_stone_type": "end",
     "salt": 1246207470
   }
 }

@@ -6,9 +6,6 @@ import com.bonker.swordinthestone.common.networking.ServerboundEnderRiftPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-
-import javax.annotation.Nullable;
 
 public class SideUtil {
     public static void controlEnderRift(EnderRift enderRift, Player player) {
@@ -20,10 +17,8 @@ public class SideUtil {
         enderRift.move(MoverType.SELF, enderRift.getDeltaMovement());
     }
 
-    public static long getTimeSinceTick(@Nullable Level level, long tick) {
-        if (level == null && (level = Minecraft.getInstance().level) == null) {
-            return 0;
-        }
-        return level.getGameTime() - tick;
+    public static long getTimeSinceTick(long tick) {
+        if (Minecraft.getInstance().level == null) return 0;
+        return Minecraft.getInstance().level.getGameTime() - tick;
     }
 }

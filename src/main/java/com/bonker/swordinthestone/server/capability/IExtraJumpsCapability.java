@@ -1,4 +1,4 @@
-package com.bonker.swordinthestone.common.capability;
+package com.bonker.swordinthestone.server.capability;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;

@@ -41,7 +41,16 @@ public class AbilityUtil {
     }
 
     public static boolean isOnCooldown(ItemStack stack, @Nullable Level level, int cooldownLength) {
-        return SideUtil.getTimeSinceTick(level, stack.getOrCreateTag().getInt("lastUsedTick")) < cooldownLength;
+        long lastUsedTick = stack.getOrCreateTag().getInt("lastUsedTick");
+
+        long time;
+        if (level != null) {
+            time = level.getGameTime() - lastUsedTick;
+        } else {
+            time = SideUtil.getTimeSinceTick(lastUsedTick);
+        }
+
+        return time < cooldownLength;
     }
 
     public static void setOnCooldown(ItemStack stack, Level level) {
@@ -53,6 +62,6 @@ public class AbilityUtil {
     }
 
     public static int cooldownProgress(ItemStack stack, Supplier<Integer> cooldownSupplier) {
-        return AbilityUtil.barProgress((int) SideUtil.getTimeSinceTick(null, stack.getOrCreateTag().getInt("lastUsedTick")), cooldownSupplier.get());
+        return AbilityUtil.barProgress((int) SideUtil.getTimeSinceTick(stack.getOrCreateTag().getInt("lastUsedTick")), cooldownSupplier.get());
     }
 }
