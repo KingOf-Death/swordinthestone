@@ -21,7 +21,6 @@ import com.bonker.swordinthestone.util.AbilityUtil;
 import com.bonker.swordinthestone.util.Color;
 import com.bonker.swordinthestone.util.DoubleJumpEvent;
 import com.bonker.swordinthestone.util.Util;
-import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -48,11 +47,8 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.RegistryObject;
-import org.slf4j.Logger;
 
 public class CommonEvents {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     @Mod.EventBusSubscriber(modid = SwordInTheStone.MODID)
     public static class ForgeBus {
         @SubscribeEvent
@@ -186,11 +182,10 @@ public class CommonEvents {
             for (RegistryObject<Item> itemObj : SSItems.ITEMS.getEntries()) {
                 if (itemObj.get() instanceof UniqueSwordItem uniqueSwordItem) {
                     for (RegistryObject<SwordAbility> abilityObj : SwordAbilities.SWORD_ABILITIES.getEntries()) {
-                        UniqueSwordItem.STYLE_TABLE.put(uniqueSwordItem, abilityObj.get(), Color.uniqueSwordColor(abilityObj.get().getColor().getValue(), uniqueSwordItem.getColor()));
+                        UniqueSwordItem.COLOR_TABLE.put(uniqueSwordItem, abilityObj.get(), Color.uniqueSwordColor(abilityObj.get().getColor().getValue(), uniqueSwordItem.getColor()));
                     }
                 }
             }
-            LOGGER.info("Filled the Unique Sword text style table with {} combinations", UniqueSwordItem.STYLE_TABLE.size());
         }
 
         @SubscribeEvent

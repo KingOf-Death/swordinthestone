@@ -204,7 +204,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
 
     public float[] getBeamColor() {
         if (stack.getItem() instanceof UniqueSwordItem uniqueSwordItem) {
-            Color color = UniqueSwordItem.STYLE_TABLE.get(uniqueSwordItem, AbilityUtil.getSwordAbility(stack));
+            Color color = UniqueSwordItem.COLOR_TABLE.get(uniqueSwordItem, AbilityUtil.getSwordAbility(stack));
             if (color != null) return color.getDiffusedColor();
         }
         return AbilityUtil.getSwordAbility(stack).getDiffusedColor();

@@ -41,7 +41,7 @@ import java.util.function.Consumer;
 
 public class UniqueSwordItem extends SwordItem {
     public static final Tier TIER = new ForgeTier(0, SSConfig.DURABILITY.get(), 0, 0, 10, BlockTags.MINEABLE_WITH_PICKAXE, () -> Ingredient.EMPTY);
-    public static final HashBasedTable<UniqueSwordItem, SwordAbility, Color> STYLE_TABLE = HashBasedTable.create();
+    public static final HashBasedTable<UniqueSwordItem, SwordAbility, Color> COLOR_TABLE = HashBasedTable.create();
     public static final String DAMAGE_TAG = "damage";
     public static final String SPEED_TAG = "speed";
 
@@ -168,7 +168,7 @@ public class UniqueSwordItem extends SwordItem {
     public Component getName(ItemStack pStack) {
         SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
         if (ability == SwordAbility.NONE) return super.getName(pStack);
-        Color color = STYLE_TABLE.get(this, ability);
+        Color color = COLOR_TABLE.get(this, ability);
         return Component.translatable(ability.getTitleKey(), super.getName(pStack)).withStyle(color == null ? Style.EMPTY : color.getStyle());
     }
 
