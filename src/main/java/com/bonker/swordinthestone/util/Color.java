@@ -1,19 +1,15 @@
 package com.bonker.swordinthestone.util;
 
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.FastColor;
 
 public class Color {
-    private static final int DARKEN = 0xFF383838;
-
-    private final int value, argbcolor, bgcolor;
+    private final int value, cooldown;
     private final Style style;
     private final float[] diffusedColor;
 
     public Color(int value) {
         this.value = value;
-        this.argbcolor = value | 0xFF000000;
-        this.bgcolor = FastColor.ARGB32.multiply(argbcolor, DARKEN);
+        this.cooldown = value | 0x7F000000;
         this.style = Style.EMPTY.withColor(value);
         this.diffusedColor = diffuseColor(value);
     }
@@ -22,12 +18,8 @@ public class Color {
         return value;
     }
 
-    public int getARGB() {
-        return argbcolor;
-    }
-
-    public int getBG() {
-        return bgcolor;
+    public int getCooldownColor() {
+        return cooldown;
     }
 
     public Style getStyle() {

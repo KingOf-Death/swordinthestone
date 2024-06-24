@@ -21,4 +21,8 @@ public class SideUtil {
         if (Minecraft.getInstance().level == null) return 0;
         return Minecraft.getInstance().level.getGameTime() - tick;
     }
+
+    public static void releaseRightClick() {
+        Minecraft.getInstance().options.keyUse.setDown(false);
+    }
 }

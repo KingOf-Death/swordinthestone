@@ -2,10 +2,7 @@ package com.bonker.swordinthestone.client;
 
 import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.client.gui.SSGuiOverlay;
-import com.bonker.swordinthestone.client.particle.AirParticle;
-import com.bonker.swordinthestone.client.particle.FireParticle;
-import com.bonker.swordinthestone.client.particle.HealParticle;
-import com.bonker.swordinthestone.client.particle.SSParticles;
+import com.bonker.swordinthestone.client.particle.*;
 import com.bonker.swordinthestone.client.renderer.SSBEWLR;
 import com.bonker.swordinthestone.client.renderer.SwordStoneBlockEntityRenderer;
 import com.bonker.swordinthestone.client.renderer.entity.EnderRiftRenderer;
@@ -83,6 +80,7 @@ public class ClientEvents {
             event.registerSpriteSet(SSParticles.HEAL.get(), HealParticle.Provider::new);
             event.registerSpriteSet(SSParticles.FIRE.get(), FireParticle.Provider::new);
             event.registerSpriteSet(SSParticles.AIR.get(), AirParticle.Provider::new);
+            event.registerSpriteSet(SSParticles.VORTEX.get(), VortexParticle.Provider::new);
         }
 
         @SubscribeEvent

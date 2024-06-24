@@ -135,8 +135,8 @@ public class UniqueSwordItem extends SwordItem {
     }
 
     @Override
-    public boolean isFoil(ItemStack pStack) {
-        return super.isFoil(pStack) || AbilityUtil.getSwordAbility(pStack).hasGlint(pStack);
+    public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration) {
+        AbilityUtil.getSwordAbility(pStack).useTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
     }
 
     @Override
@@ -151,12 +151,12 @@ public class UniqueSwordItem extends SwordItem {
 
     @Override
     public int getUseDuration(ItemStack pStack) {
-        return AbilityUtil.getSwordAbility(pStack).getUseDuration();
+        return AbilityUtil.getSwordAbility(pStack).getUseDuration(pStack);
     }
 
     @Override
     public UseAnim getUseAnimation(ItemStack pStack) {
-        return AbilityUtil.getSwordAbility(pStack).getUseAnimation();
+        return AbilityUtil.getSwordAbility(pStack).getUseAnimation(pStack);
     }
 
     @Override
@@ -178,6 +178,9 @@ public class UniqueSwordItem extends SwordItem {
         if (ability != SwordAbility.NONE) {
             pTooltipComponents.add(Component.literal("★ ").append(Component.translatable(ability.getNameKey())).withStyle(ability.getColorStyle()));
             pTooltipComponents.add(Component.translatable(ability.getDescriptionKey()).withStyle(ChatFormatting.GRAY));
+            if (pStack.isEnchanted()) {
+                pTooltipComponents.add(Component.empty());
+            }
         }
     }
 

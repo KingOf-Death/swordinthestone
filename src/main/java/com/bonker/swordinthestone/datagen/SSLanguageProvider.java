@@ -29,6 +29,7 @@ public class SSLanguageProvider extends LanguageProvider {
         add(SwordAbilities.DOUBLE_JUMP.get(), "Double Jump", "Aetherial %s", "While holding, tap space in the air to double jump\nFall damage is reduced while holding");
         add(SwordAbilities.ALCHEMIST.get(), "Alchemist", "Chemical %s", "Inflicts a negative status effect on hit occasionally\nGrants the user a positive status effect on kill occasionally");
         add(SwordAbilities.BAT_SWARM.get(), "Bat Swarm", "Unholy %s", "Right click to ride a swarm of bats that attacks mobs");
+        add(SwordAbilities.VORTEX_CHARGE.get(), "Vortex Charge", "Cyclonic %s", "Gains vortex energy passively\nHold right click to attract entities\nShift right click to release all vortex energy, repelling entities");
 
         add("ability.swordinthestone.alchemist.victim", "Alchemist: Inflicted victim with %s");
         add("ability.swordinthestone.alchemist.self", "Alchemist: Applied %s to self");
@@ -69,6 +70,9 @@ public class SSLanguageProvider extends LanguageProvider {
         addConfig("batSwarmCooldown", "Bat Swarm Cooldown");
         addConfig("batSwarmDuration", "Bat Swarm Duration");
         addConfig("batSwarmDamage", "Bat Swarm Attack Damage");
+        addConfig("vortexChargeCapacity", "Vortex Charge Capacity");
+        addConfig("vortexChargePerHit", "Vortex Charge Gained Per Hit");
+        addConfig("vortexChargeDamage", "Vortex Charge Damage");
     }
 
     private void add(SwordAbility key, String name, String title, String description) {

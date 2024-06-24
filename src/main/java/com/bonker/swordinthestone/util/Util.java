@@ -104,6 +104,12 @@ public class Util {
         return base * random.nextInt(intervals + 1);
     }
 
+    public static float constrictToMultiple(float value, float base) {
+        float floor = Mth.floor(value / base) * base;
+        float ceil = floor + base;
+        return value - floor > value - ceil ? floor : ceil;
+    }
+
     public static class SwordSpinAnimation {
         private static final float[] swordSpinAnimation = net.minecraft.Util.make(new float[200], (floats) -> {
             for(int i = 0; i < floats.length; ++i) {

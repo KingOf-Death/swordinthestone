@@ -20,7 +20,6 @@ public abstract class SwordAbility {
     public static final SwordAbility NONE = new SwordAbility(0x000000) {};
 
     private final Color color;
-
     private String nameKey;
     private String titleKey;
     private String descriptionKey;
@@ -49,39 +48,38 @@ public abstract class SwordAbility {
         return InteractionResultHolder.pass(holder.getItemInHand(usedHand));
     }
 
-    public boolean hasGlint(ItemStack stack) {return false;}
+    public void useTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {}
 
-    public boolean isBarVisible(ItemStack pStack) {return false;}
+    public float getProgress(ItemStack pStack) {return 0;}
 
-    public int getBarWidth(ItemStack pStack) {return 0;}
+    public boolean progressIsCooldown(ItemStack pStack) {return true;}
 
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {}
 
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int ticks) {}
 
-    public int getUseDuration() {return 0;}
+    public int getUseDuration(ItemStack stack) {return 0;}
 
-    public UseAnim getUseAnimation() {return UseAnim.NONE;}
+    public UseAnim getUseAnimation(ItemStack stack) {return UseAnim.NONE;}
 
     public void addAttributes(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {}
 
     public String getNameKey() {
-        if (nameKey != null) return nameKey;
-        ResourceLocation loc = SwordAbilities.SWORD_ABILITY_REGISTRY.get().getKey(this);
-        if (loc == null) loc = new ResourceLocation("null");
-        nameKey = "ability." + loc.getNamespace() + "." + loc.getPath();
+        if (nameKey == null) {
+            ResourceLocation loc = SwordAbilities.SWORD_ABILITY_REGISTRY.get().getKey(this);
+            if (loc == null) loc = new ResourceLocation("null");
+            nameKey = "ability." + loc.getNamespace() + "." + loc.getPath();
+        }
         return nameKey;
     }
 
     public String getTitleKey() {
-        if (titleKey != null) return titleKey;
-        titleKey = getNameKey() + ".title";
+        if (titleKey == null) titleKey = getNameKey() + ".title";
         return titleKey;
     }
 
     public String getDescriptionKey() {
-        if (descriptionKey != null) return descriptionKey;
-        descriptionKey = getNameKey() + ".description";
+        if (descriptionKey == null) descriptionKey = getNameKey() + ".description";
         return descriptionKey;
     }
 }

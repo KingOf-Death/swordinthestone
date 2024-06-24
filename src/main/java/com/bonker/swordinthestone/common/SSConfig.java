@@ -57,6 +57,9 @@ public class SSConfig {
     public static final ForgeConfigSpec.IntValue BAT_SWARM_COOLDOWN;
     public static final ForgeConfigSpec.IntValue BAT_SWARM_DURATION;
     public static final ForgeConfigSpec.DoubleValue BAT_SWARM_DAMAGE;
+    public static final ForgeConfigSpec.IntValue VORTEX_CHARGE_CAPACITY;
+    public static final ForgeConfigSpec.IntValue VORTEX_CHARGE_PER_HIT;
+    public static final ForgeConfigSpec.DoubleValue VORTEX_CHARGE_DAMAGE;
 
     static {
         // sword stats
@@ -235,6 +238,22 @@ public class SSConfig {
                 .comment("The average length of time (in ticks) that the Bat Swarm ability will last.")
                 .translation("swordinthestone.configgui.batSwarmDamage")
                 .defineInRange("batSwarmDamage", 2.0, 0.0, 100.0);
+
+        VORTEX_CHARGE_CAPACITY = COMMON_BUILDER
+                .comment("The maximum amount of charge that a sword can hold." +
+                        "\n1 unit of charge is used each tick when holding right click.")
+                .translation("swordinthestone.configgui.vortexChargeCapacity")
+                .defineInRange("vortexChargeCapacity", 400, 1, 10000);
+
+        VORTEX_CHARGE_PER_HIT = COMMON_BUILDER
+                .comment("The amount of charge gained per each fully charged hit on a mob.")
+                .translation("swordinthestone.configgui.vortexChargePerHit")
+                .defineInRange("vortexChargePerHit", 50, 1, 10000);
+
+        VORTEX_CHARGE_DAMAGE = COMMON_BUILDER
+                .comment("The amount of damage dealt to mobs by Vortex Charge's shift-right-click ability.")
+                .translation("swordinthestone.configgui.vortexChargeDamage")
+                .defineInRange("vortexChargeDamage", 12.0, 0.0, 100.0);
 
         COMMON_CONFIG = COMMON_BUILDER.build();
     }

@@ -12,6 +12,7 @@ import com.bonker.swordinthestone.common.networking.ClientboundSyncDeltaPacket;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
 import com.bonker.swordinthestone.server.capability.DashCapability;
 import com.bonker.swordinthestone.util.AbilityUtil;
+import com.bonker.swordinthestone.util.SideUtil;
 import com.bonker.swordinthestone.util.Util;
 import com.google.common.collect.ImmutableMultimap;
 import net.minecraft.core.BlockPos;
@@ -62,8 +63,12 @@ public class SwordAbilities {
     public static final RegistryObject<SwordAbility> THUNDER_SMITE = register("thunder_smite",
             () -> new SwordAbilityBuilder(0x57faf6)
                     .onHit((level, holder, victim) -> {
+                        if (holder instanceof Player player && player.getAttackStrengthScale(0) < 0.75F) {
+                            return;
+                        }
+
                         ItemStack stack = holder.getItemInHand(InteractionHand.MAIN_HAND);
-                        int charge = stack.getOrCreateTag().getInt("charge");
+                        int charge = AbilityUtil.getCharge(stack);
                         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, victim.getX(), victim.getY() + 1.0, victim.getZ(), 20, 0.7, 1, 0.7, 0.4);
                         level.playSound(null, holder.getX(), holder.getY(), holder.getZ(), SSSounds.ZAP.get(), SoundSource.PLAYERS, 2.0F, 2.0F - charge * 0.5F);
                         if (++charge > SSConfig.THUNDER_SMITE_CHARGES.get()) {
@@ -80,9 +85,10 @@ public class SwordAbilities {
                             }
                             charge = 0;
                         }
-                        stack.getOrCreateTag().putInt("charge", charge);
+                        AbilityUtil.setCharge(stack, charge);
                     })
-                    .hasGlint(stack -> stack.getOrCreateTag().getInt("charge") >= SSConfig.THUNDER_SMITE_CHARGES.get())
+                    .customBar(stack -> false,
+                            stack -> (float) AbilityUtil.getCharge(stack) / SSConfig.THUNDER_SMITE_CHARGES.get())
                     .build());
 
     // Vampiric
@@ -155,9 +161,9 @@ public class SwordAbilities {
 
                         AbilityUtil.setOnCooldown(stack, level);
                     })
-                    .useDuration(SSConfig.ENDER_RIFT_DURATION.get())
+                    .useDuration(stack -> SSConfig.ENDER_RIFT_DURATION.get())
                     .addCooldown(SSConfig.ENDER_RIFT_COOLDOWN)
-                    .useAnimation(UseAnim.BLOCK)
+                    .useAnimation(stack -> UseAnim.BLOCK)
                     .build());
 
     // Fireball
@@ -182,9 +188,9 @@ public class SwordAbilities {
                         }
                         AbilityUtil.setOnCooldown(stack, level);
                     })
-                    .useDuration(72000)
+                    .useDuration(stack -> 72000)
                     .addCooldown(SSConfig.FIREBALL_COOLDOWN)
-                    .useAnimation(UseAnim.BOW)
+                    .useAnimation(stack -> UseAnim.BOW)
                     .build());
 
     // Double Jump
@@ -250,7 +256,7 @@ public class SwordAbilities {
                                     Component.translatable(
                                             "ability.swordinthestone.alchemist." + (victim == null ? "self" : "victim"),
                                             getPotionMessage(effect)
-                                    ).withStyle(SwordAbilities.ALCHEMIST.get().getColorStyle()),
+                                    ).withStyle(ALCHEMIST.get().getColorStyle()),
                                     effects.size() == 1
                             );
                         }
@@ -309,6 +315,108 @@ public class SwordAbilities {
             .addCooldown(SSConfig.BAT_SWARM_COOLDOWN)
             .build());
 
+    public static final RegistryObject<SwordAbility> VORTEX_CHARGE = register("vortex_charge",
+            () -> new SwordAbilityBuilder(0x00ffb9)
+                    .onUse((level, player, usedHand) -> {
+                        ItemStack stack = player.getItemInHand(usedHand);
+                        int charge = AbilityUtil.getCharge(stack);
+                        if (player.isCrouching()) {
+                            if (level.isClientSide) {
+                                SideUtil.releaseRightClick();
+                            }
+
+                            if (charge > 0) {
+                                AbilityUtil.setCharge(stack, 0);
+
+                                player.swing(usedHand);
+
+                                if (level.isClientSide) {
+                                    for (int i = 0; i < 20 + (charge / SSConfig.VORTEX_CHARGE_CAPACITY.get()) * 40; i++) {
+                                        Vec3 pos = player.getEyePosition().add((level.random.nextFloat() - 0.5) * 0.5, (level.random.nextFloat() - 0.5) * 0.5, (level.random.nextFloat() - 0.5) * 0.5);
+                                        Vec3 delta = player.getEyePosition().subtract(pos).normalize();
+                                        level.addParticle(SSParticles.VORTEX.get(), pos.x(), pos.y(), pos.z(), delta.x(), delta.y(), delta.z());
+                                    }
+                                } else {
+                                    level.playSound(null, player.blockPosition(), SSSounds.VORTEX.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+
+                                    double percentCharge = charge / (float) SSConfig.VORTEX_CHARGE_CAPACITY.get();
+                                    double range = 5 + percentCharge * 15;
+                                    for (Entity entity : level.getEntities(player, AABB.ofSize(player.getEyePosition(), range, range, range))) {
+                                        double percentDistance = (10 - entity.distanceTo(player)) / 10F;
+                                        double scale = percentCharge * percentDistance;
+
+                                        entity.hurt(level.damageSources().playerAttack(player), SSConfig.VORTEX_CHARGE_DAMAGE.get().floatValue() * (float) scale);
+
+                                        Vec3 delta = entity.position()
+                                                .subtract(player.position())
+                                                .normalize()
+                                                .add(0, scale * 0.2, 0)
+                                                .scale(scale * 5);
+                                        entity.push(delta.x(), delta.y(), delta.z());
+                                        entity.resetFallDistance();
+                                    }
+                                }
+
+                                return InteractionResultHolder.success(stack);
+                            }
+                        } else if (charge > 0) {
+                            level.playSound(null, player.blockPosition(), SSSounds.SUCTION.get(), SoundSource.PLAYERS, 1.0F, 1.4F);
+                        }
+                        return InteractionResultHolder.pass(stack);
+                    })
+                    .onUseTick((level, user, stack, remainingUseDuration) -> {
+                        int charge = AbilityUtil.getCharge(stack);
+                        if (charge > 0) {
+                            AbilityUtil.setCharge(stack, charge - 1);
+                            for (Entity entity : level.getEntities(user, AABB.ofSize(user.position(), 20, 20, 20), e -> e.getBoundingBox().getSize() < 2.5)) {
+                                if (!level.isClientSide) {
+                                    double percentDistance = (15 - entity.distanceTo(user)) / 15F;
+                                    entity.setDeltaMovement(user.position()
+                                            .subtract(entity.getX(), entity.getY() - 0.5, entity.getZ())
+                                            .normalize()
+                                            .multiply(percentDistance * 0.4, percentDistance * 0.4, percentDistance * 0.4));
+                                    entity.hurtMarked = true;
+                                    entity.resetFallDistance();
+                                }
+                            }
+
+                            if (!level.isClientSide && remainingUseDuration % 18 == 0) {
+                                level.playSound(null, user.blockPosition(), SSSounds.SUCTION.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                            }
+
+                            if (level.isClientSide) {
+                                for (int i = 0; i < 4; i++) {
+                                    Vec3 pos = user.position().add((level.random.nextFloat() - 0.5) * 15, (level.random.nextFloat() - 0.5) * 0.2, (level.random.nextFloat() - 0.5) * 15);
+                                    Vec3 delta = user.position().subtract(pos).normalize().scale(0.2);
+                                    level.addParticle(SSParticles.VORTEX.get(), pos.x(), pos.y() + 0.5, pos.z(), delta.x(), delta.y(), delta.z());
+                                }
+                            }
+                        }
+                    })
+                    .onHit((level, attacker, victim) -> {
+                        float percent = 1;
+                        if (attacker instanceof Player player) {
+                            float scale = player.getAttackStrengthScale(0);
+                            if (scale < 0.75F) {
+                                return;
+                            }
+                            percent = scale * scale;
+                        }
+
+                        ItemStack stack = attacker.getItemInHand(InteractionHand.MAIN_HAND);
+                        int charge = AbilityUtil.getCharge(stack);
+                        if (charge < SSConfig.VORTEX_CHARGE_CAPACITY.get()) {
+                            level.sendParticles(SSParticles.VORTEX.get(), victim.getX(), victim.getY() + 0.5, victim.getZ(), Mth.ceil(percent * 12), 0.4, 0.1, 0.4, 0.2);
+
+                            level.playSound(null, victim.blockPosition(), SSSounds.WHOOSH.get(), SoundSource.PLAYERS, 1.0F, 0.6F + level.random.nextFloat() * 0.8F);
+
+                            AbilityUtil.setCharge(stack, Math.min(SSConfig.VORTEX_CHARGE_CAPACITY.get(), charge + Mth.floor(percent * SSConfig.VORTEX_CHARGE_PER_HIT.get())));
+                        }
+                    })
+                    .customBar(stack -> false, stack -> (float) AbilityUtil.getCharge(stack) / SSConfig.VORTEX_CHARGE_CAPACITY.get())
+                    .useDuration(AbilityUtil::getCharge)
+                    .useAnimation(stack -> UseAnim.BOW)
+                    .build());
 
     private static RegistryObject<SwordAbility> register(String name, Supplier<SwordAbility> supplier) {
         SwordInTheStone.ABILITY_MODEL_MAP.put(SwordInTheStone.MODID + ":" + name, Util.makeResource("item/ability/" + name));

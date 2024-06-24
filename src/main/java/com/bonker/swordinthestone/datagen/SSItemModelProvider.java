@@ -50,14 +50,15 @@ public class SSItemModelProvider extends ItemModelProvider {
         uniqueSwordVariant(SSItems.NETHER_SWORD.get(), "nether_sword", "Sword of the Nether");
         uniqueSwordVariant(SSItems.END_SWORD.get(), "end_sword", "Sword of the End");
 
-        abilityOverlayAnim("thunder_smite", 2, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8});
-        abilityOverlayAnim("vampiric", 2, null);
-        abilityOverlayAnim("toxic_dash", 3, null);
-        abilityOverlayAnim("ender_rift", 2, null);
-        abilityOverlayAnim("fireball", 2, null);
-        abilityOverlayAnim("double_jump", 2, null);
-        abilityOverlayAnim("alchemist", 3, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13});
-        abilityOverlayAnim("bat_swarm", 2, null);
+        abilityOverlay("thunder_smite", 2, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8});
+        abilityOverlay("vampiric", 2, null);
+        abilityOverlay("toxic_dash", 3, null);
+        abilityOverlay("ender_rift", 2, null);
+        abilityOverlay("fireball", 2, null);
+        abilityOverlay("double_jump", 2, null);
+        abilityOverlay("alchemist", 3, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13});
+        abilityOverlay("bat_swarm", 2, null);
+        abilityOverlay("vortex_charge", 2, null);
 
         swordStoneVariant(Blocks.COBBLESTONE);
         swordStoneVariant("sandstone", "sandstone_bottom");
@@ -84,14 +85,7 @@ public class SSItemModelProvider extends ItemModelProvider {
                 .texture("layer0", new ResourceLocation(loc.getNamespace(), "item/" + loc.getPath()));
     }
 
-    public void abilityOverlay(String id) {
-        ResourceLocation loc = Util.makeResource("item/ability/" + id);
-        getBuilder(loc.toString())
-                .parent(new ModelFile.UncheckedModelFile("swordinthestone:item/unique_sword"))
-                .texture("layer0", new ResourceLocation(loc.getNamespace(), loc.getPath()));
-    }
-
-    public void abilityOverlayAnim(String id, int frametime, @Nullable int[] frames) {
+    public void abilityOverlay(String id, int frametime, @Nullable int[] frames) {
         animatedTextureProvider.create("item/ability/" + id).frametime(frametime).frames(frames);
         ResourceLocation loc = Util.makeResource("item/ability/" + id);
         getBuilder(loc.toString())
@@ -109,13 +103,8 @@ public class SSItemModelProvider extends ItemModelProvider {
     }
 
     public void swordStoneVariant(Block block) {
-        ResourceLocation loc = ForgeRegistries.BLOCKS.getKey(block);
-        if (loc == null) return;
-        ItemModelBuilder builder = getBuilder("swordinthestone:block/sword_stone_" + loc.getPath())
-                .parent(new ModelFile.ExistingModelFile(new ResourceLocation("swordinthestone", "block/sword_stone"), existingFileHelper));
-        ResourceLocation texture = new ResourceLocation(loc.getNamespace(), "block/" + loc.getPath());
-        builder.texture("0", texture).texture("particle", texture);
-        blockStateProvider.swordStoneVariants.put(loc.getPath(), new ModelFile.ExistingModelFile(builder.getLocation(), existingFileHelper));
+        ResourceLocation key = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block));
+        swordStoneVariant(key.getPath(), key.getPath());
     }
 
     public void swordStoneVariant(String name, String blockTexture) {

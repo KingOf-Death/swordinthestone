@@ -30,6 +30,9 @@ public class SSSoundProvider extends SoundDefinitionsProvider {
         createSingleSound("rift", "Ender rift created", "rift");
         createSingleSound("jump", "Player double jumps", "jump");
         createSingleSound("land", "Player lands softly", "land");
+        createSingleSound("suction", "Vortex suction", "suction");
+        createSingleSound("vortex", "Powerful vortex blast", "vortex");
+        createSingleSound("whoosh", "Vortex energy released", "whoosh");
     }
 
     private void createMultiSound(String name, String subtitle, String... sounds) {

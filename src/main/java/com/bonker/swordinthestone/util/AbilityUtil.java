@@ -4,7 +4,6 @@ import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -36,10 +35,6 @@ public class AbilityUtil {
         return getSwordAbility(holder) == ability;
     }
 
-    public static int barProgress(int progress, int maxProgress) {
-        return Mth.clamp(Math.round(progress * 13.0F / maxProgress), 0, 13);
-    }
-
     public static boolean isOnCooldown(ItemStack stack, @Nullable Level level, int cooldownLength) {
         long lastUsedTick = stack.getOrCreateTag().getInt("lastUsedTick");
 
@@ -57,11 +52,18 @@ public class AbilityUtil {
         stack.getOrCreateTag().putLong("lastUsedTick", level.getGameTime());
     }
 
-    public static boolean showCooldownBar(ItemStack stack, Supplier<Integer> cooldownSupplier) {
-        return isOnCooldown(stack, null, cooldownSupplier.get());
+    public static float cooldownProgress(ItemStack stack, Supplier<Integer> cooldownSupplier) {
+        long time = SideUtil.getTimeSinceTick(stack.getOrCreateTag().getInt("lastUsedTick"));
+        int cooldown = cooldownSupplier.get();
+        if (time >= cooldown) return 0;
+        return (float) time / cooldown;
     }
 
-    public static int cooldownProgress(ItemStack stack, Supplier<Integer> cooldownSupplier) {
-        return AbilityUtil.barProgress((int) SideUtil.getTimeSinceTick(stack.getOrCreateTag().getInt("lastUsedTick")), cooldownSupplier.get());
+    public static int getCharge(ItemStack stack) {
+        return stack.getOrCreateTag().getInt("charge");
+    }
+
+    public static void setCharge(ItemStack stack, int charge) {
+        stack.getOrCreateTag().putInt("charge", charge);
     }
 }

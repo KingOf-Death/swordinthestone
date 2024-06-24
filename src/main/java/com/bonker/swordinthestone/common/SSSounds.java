@@ -22,7 +22,9 @@ public class SSSounds {
     public static final RegistryObject<SoundEvent> RIFT = register("rift");
     public static final RegistryObject<SoundEvent> JUMP = register("jump");
     public static final RegistryObject<SoundEvent> LAND = register("land");
-
+    public static final RegistryObject<SoundEvent> SUCTION = register("suction");
+    public static final RegistryObject<SoundEvent> VORTEX = register("vortex");
+    public static final RegistryObject<SoundEvent> WHOOSH = register("whoosh");
 
 
     private static RegistryObject<SoundEvent> register(String name) {

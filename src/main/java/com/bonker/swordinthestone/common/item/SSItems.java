@@ -30,8 +30,8 @@ public class SSItems {
             .title(Component.translatable("item_group.swordinthestone.swords"))
             .icon(() -> new ItemStack(FOREST_SWORD.get()))
             .displayItems(((params, items) -> {
-                float damage = SSConfig.BASE_DAMAGE.get() - 1 + 0.5F * SSConfig.MAX_DAMAGE_MODIFIER.get().floatValue();
-                float speed = SSConfig.BASE_SPEED.get().floatValue() + 0.5F * SSConfig.MAX_SPEED_MODIFIER.get().floatValue();
+                float damage = SSConfig.BASE_DAMAGE.get() - 1 + Util.constrictToMultiple(0.5F * SSConfig.MAX_DAMAGE_MODIFIER.get().floatValue(), 0.5F);
+                float speed = SSConfig.BASE_SPEED.get().floatValue() + Util.constrictToMultiple(0.5F * SSConfig.MAX_SPEED_MODIFIER.get().floatValue(), 0.5F);
 
                 for (RegistryObject<Item> item : SSItems.ITEMS.getEntries()) {
                     if (item.get() instanceof UniqueSwordItem sword) {
