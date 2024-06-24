@@ -18,7 +18,7 @@ public class SSItemDecorator {
 
                 guiGraphics.fill(RenderType.guiOverlay(), xOffset, minY, xOffset + 16, maxY, ability.getColor().getCooldownColor());
             } else {
-                guiGraphics.fill(RenderType.guiOverlay(), xOffset, yOffset + 11, xOffset + Math.round(16 * progress), yOffset + 16, -400, ability.getColor().getCooldownColor());
+                guiGraphics.fill(RenderType.guiOverlay(), xOffset, yOffset + 11, xOffset + Math.round(16 * progress), yOffset + 16, ability.getColor().getCooldownColor());
             }
         }
         return false;
