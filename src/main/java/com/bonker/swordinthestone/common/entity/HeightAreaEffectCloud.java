@@ -14,13 +14,13 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class HeightAreaEffectCloud extends AreaEffectCloud {
-    private static final DustParticleOptions TOXIC_DASH_PARTICLE = new DustParticleOptions(Vec3.fromRGB24(SwordAbilities.TOXIC_DASH.get().getColor()).toVector3f(), 1.25F);
+    private static final DustParticleOptions TOXIC_DASH_PARTICLE = new DustParticleOptions(new Vector3f(SwordAbilities.TOXIC_DASH.get().getColor().getDiffusedColor()), 1.25F);
     private static final EntityDataAccessor<Float> DATA_HEIGHT = SynchedEntityData.defineId(HeightAreaEffectCloud.class, EntityDataSerializers.FLOAT);
     private boolean ownerImmune = false;
 

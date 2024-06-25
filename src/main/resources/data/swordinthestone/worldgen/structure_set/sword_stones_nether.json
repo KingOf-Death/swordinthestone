@@ -14,9 +14,8 @@
     }
   ],
   "placement": {
-    "type": "minecraft:random_spread",
-    "spacing": 35,
-    "separation": 10,
-    "salt": 1446207470
+    "type": "swordinthestone:sword_stone_placement",
+    "sword_stone_type": "nether",
+    "salt": 1159375930
   }
 }

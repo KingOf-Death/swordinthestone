@@ -1,8 +1,8 @@
 package com.bonker.swordinthestone.common.networking;
 
-import com.bonker.swordinthestone.common.capability.DashCapability;
-import com.bonker.swordinthestone.common.capability.IDashCapability;
 import com.bonker.swordinthestone.common.entity.HeightAreaEffectCloud;
+import com.bonker.swordinthestone.server.capability.DashCapability;
+import com.bonker.swordinthestone.server.capability.IDashCapability;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.ability;
 
+import com.bonker.swordinthestone.util.AbilityUtil;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.server.level.ServerLevel;
@@ -16,17 +17,19 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class SwordAbilityBuilder {
     private final int color;
     private HitAction onHit, onKill;
     private UseAction onUse;
-    private Function<ItemStack, Boolean> hasGlint, showBar;
-    private Function<ItemStack, Integer> barWidth, barColor;
+    private UseTickAction onUseTick;
+    private Function<ItemStack, Boolean> isCooldown;
+    private Function<ItemStack, Float> getProgress;
     private TickAction inventoryTick;
     private ReleaseAction onRelease;
-    private int useDuration = 0;
-    private UseAnim useAnim = UseAnim.NONE;
+    private Function<ItemStack, Integer> useDuration;
+    private Function<ItemStack, UseAnim> useAnim;
     private Multimap<Attribute, AttributeModifier> attributes;
 
     public SwordAbilityBuilder(int color) {
@@ -48,15 +51,14 @@ public class SwordAbilityBuilder {
         return this;
     }
 
-    public SwordAbilityBuilder hasGlint(Function<ItemStack, Boolean> hasGlint) {
-        this.hasGlint = hasGlint;
+    public SwordAbilityBuilder onUseTick(UseTickAction onUseTick) {
+        this.onUseTick = onUseTick;
         return this;
     }
 
-    public SwordAbilityBuilder customBar(Function<ItemStack, Boolean> showBar, Function<ItemStack, Integer> barWidth, Function<ItemStack, Integer> barColor) {
-        this.showBar = showBar;
-        this.barWidth = barWidth;
-        this.barColor = barColor;
+    public SwordAbilityBuilder customBar(Function<ItemStack, Boolean> isCooldown, Function<ItemStack, Float> getProgress) {
+        this.isCooldown = isCooldown;
+        this.getProgress = getProgress;
         return this;
     }
 
@@ -70,12 +72,12 @@ public class SwordAbilityBuilder {
         return this;
     }
 
-    public SwordAbilityBuilder useDuration(int useDuration) {
+    public SwordAbilityBuilder useDuration(Function<ItemStack, Integer> useDuration) {
         this.useDuration = useDuration;
         return this;
     }
 
-    public SwordAbilityBuilder useAnimation(UseAnim useAnim) {
+    public SwordAbilityBuilder useAnimation(Function<ItemStack, UseAnim> useAnim) {
         this.useAnim = useAnim;
         return this;
     }
@@ -85,35 +87,41 @@ public class SwordAbilityBuilder {
         return this;
     }
 
-    public SwordAbility build() {
-        return new BuiltSwordAbility(color, onHit, onKill, onUse, hasGlint, showBar, barWidth, barColor, inventoryTick, onRelease, useDuration, useAnim, attributes);
+    public SwordAbilityBuilder addCooldown(Supplier<Integer> cooldownSupplier) {
+        return customBar(stack -> true,
+                stack -> AbilityUtil.cooldownProgress(stack, cooldownSupplier)
+        );
     }
 
-    private static class BuiltSwordAbility extends SwordAbility {
+    public SwordAbility build() {
+        return new SwordAbilityImpl(color, onHit, onKill, onUse, onUseTick, isCooldown, getProgress, inventoryTick, onRelease, useDuration, useAnim, attributes);
+    }
+
+    private static class SwordAbilityImpl extends SwordAbility {
         private final HitAction onHit, onKill;
         private final UseAction onUse;
-        private final Function<ItemStack, Boolean> hasGlint, showBar;
-        private final Function<ItemStack, Integer> barWidth, barColor;
+        private final UseTickAction onUseTick;
+        private final Function<ItemStack, Boolean> isCooldown;
+        private final Function<ItemStack, Float> getProgress;
         private final TickAction inventoryTick;
         private final ReleaseAction onRelease;
-        private final int useDuration;
-        private final UseAnim useAnim;
+        private final Function<ItemStack, Integer> useDuration;
+        private final Function<ItemStack, UseAnim> useAnim;
         private final Multimap<Attribute, AttributeModifier> attributes;
 
-        private BuiltSwordAbility(int color, @Nullable HitAction onHit, @Nullable HitAction onKill,
-                                  @Nullable UseAction onUse, @Nullable Function<ItemStack, Boolean> hasGlint,
-                                  @Nullable Function<ItemStack, Boolean> showBar, @Nullable Function<ItemStack, Integer> barWidth,
-                                  @Nullable Function<ItemStack, Integer> barColor, @Nullable TickAction inventoryTick,
-                                  @Nullable ReleaseAction onRelease, int useDuration, UseAnim useAnim,
-                                  Multimap<Attribute, AttributeModifier> attributes) {
+        private SwordAbilityImpl(int color, @Nullable HitAction onHit, @Nullable HitAction onKill,
+                                 @Nullable UseAction onUse, @Nullable UseTickAction onUseTick,
+                                 @Nullable Function<ItemStack, Boolean> isCooldown, @Nullable Function<ItemStack, Float> getProgress,
+                                 @Nullable TickAction inventoryTick, @Nullable ReleaseAction onRelease,
+                                 @Nullable Function<ItemStack, Integer> useDuration, @Nullable Function<ItemStack, UseAnim> useAnim,
+                                 @Nullable Multimap<Attribute, AttributeModifier> attributes) {
             super(color);
             this.onHit = onHit;
             this.onKill = onKill;
             this.onUse = onUse;
-            this.hasGlint = hasGlint;
-            this.showBar = showBar;
-            this.barWidth = barWidth;
-            this.barColor = barColor;
+            this.onUseTick = onUseTick;
+            this.isCooldown = isCooldown;
+            this.getProgress = getProgress;
             this.inventoryTick = inventoryTick;
             this.onRelease = onRelease;
             this.useDuration = useDuration;
@@ -138,27 +146,20 @@ public class SwordAbilityBuilder {
         }
 
         @Override
-        public boolean hasGlint(ItemStack stack) {
-            if (hasGlint != null) return hasGlint.apply(stack);
-            return super.hasGlint(stack);
+        public void useTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
+            if (onUseTick != null) onUseTick.run(level, livingEntity, stack, remainingUseDuration);
         }
 
         @Override
-        public boolean isBarVisible(ItemStack stack) {
-            if (showBar != null) return showBar.apply(stack);
-            return super.isBarVisible(stack);
+        public float getProgress(ItemStack stack) {
+            if (getProgress != null) return getProgress.apply(stack);
+            return super.getProgress(stack);
         }
 
         @Override
-        public int getBarWidth(ItemStack stack) {
-            if (barWidth != null) return barWidth.apply(stack);
-            return super.getBarWidth(stack);
-        }
-
-        @Override
-        public int getBarColor(ItemStack stack) {
-            if (barColor != null) return barColor.apply(stack);
-            return super.getBarColor(stack);
+        public boolean progressIsCooldown(ItemStack pStack) {
+            if (isCooldown != null) return isCooldown.apply(pStack);
+            return super.progressIsCooldown(pStack);
         }
 
         @Override
@@ -172,13 +173,15 @@ public class SwordAbilityBuilder {
         }
 
         @Override
-        public int getUseDuration() {
-            return useDuration;
+        public int getUseDuration(ItemStack stack) {
+            if (useDuration == null) return 0;
+            return useDuration.apply(stack);
         }
 
         @Override
-        public UseAnim getUseAnimation() {
-            return useAnim;
+        public UseAnim getUseAnimation(ItemStack stack) {
+            if (useAnim == null) return UseAnim.NONE;
+            return useAnim.apply(stack);
         }
 
         @Override
@@ -197,6 +200,11 @@ public class SwordAbilityBuilder {
     @FunctionalInterface
     public interface UseAction {
         InteractionResultHolder<ItemStack> run(Level level, Player player, InteractionHand usedHand);
+    }
+
+    @FunctionalInterface
+    public interface UseTickAction {
+        void run(Level level, LivingEntity entity, ItemStack stack, int remainingUseDuration);
     }
 
     @FunctionalInterface

@@ -1,6 +1,7 @@
 package com.bonker.swordinthestone.common.networking;
 
-import com.bonker.swordinthestone.common.capability.ExtraJumpsCapability;
+import com.bonker.swordinthestone.common.SSConfig;
+import com.bonker.swordinthestone.server.capability.ExtraJumpsCapability;
 import com.bonker.swordinthestone.util.DoubleJumpEvent;
 import com.bonker.swordinthestone.util.Util;
 import net.minecraft.network.FriendlyByteBuf;
@@ -48,10 +49,15 @@ public class ServerboundExtraJumpPacket {
                 if (backward) forwards -= 0.5;
 
                 Vec3 delta = Util.relativeVec(new Vec2(0, player.getYRot()), forwards, 0.5, sideways);
-                player.setDeltaMovement(delta);
                 ExtraJumpsCapability.useJump(player);
 
-                SSNetworking.sendToPlayer(new ClientboundSyncDeltaPacket(delta), player);
+                if (player.getVehicle() == null || !SSConfig.DOUBLE_JUMP_VEHICLE.get()) {
+                    player.setDeltaMovement(delta);
+                    SSNetworking.sendToPlayer(new ClientboundSyncDeltaPacket(delta), player);
+                } else {
+                    player.getVehicle().setDeltaMovement(delta);
+                    SSNetworking.sendToPlayer(new ClientboundSyncDeltaPacket(delta, player.getVehicle().getId()), player);
+                }
             }
         }
     }

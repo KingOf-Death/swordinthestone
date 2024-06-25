@@ -1,5 +1,6 @@
 package com.bonker.swordinthestone.common.block.entity;
 
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.SSSounds;
 import com.bonker.swordinthestone.common.block.SSBlocks;
 import com.bonker.swordinthestone.common.block.SwordStoneBlock;
@@ -30,6 +31,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nullable;
+
 public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordStoneBlockEntity {
     public static final String ITEM_TAG = "Item";
     public static final String VARIANT_TAG = "variant";
@@ -38,7 +41,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
     public static final int BEACON_ANIMATION_TIME = 140;
     public static final int BEACON_ANIMATION_CYCLE = 600;
     public static final int SHAKE_ANIMATION_TIME = 10;
-    public static final int REQUIRED_SHAKES = 40;
+    public static final int REQUIRED_SHAKES = 47;
     public static final int IDLE_TIME = 100;
 
     private static final ParticleOptions PARTICLE_FALLBACK = ParticleTypes.NOTE;
@@ -47,7 +50,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
     public short progress = 0;
     public int ticksSinceLastInteraction = 0;
     public int idleTicks;
-    private boolean hasSword = false;
+    public boolean hasSword = false;
     private boolean sendSyncPacket = false;
     private String variant = "";
 
@@ -68,17 +71,14 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
     public InteractionResult interact(Player pPlayer, InteractionHand pHand) {
         assert level != null;
 
-        if ((idleTicks > 0 && idleTicks < BEACON_ANIMATION_TIME) // can't be spinning
-            || !hasSword // has a sword to shake
-            || ticksSinceLastInteraction <= SHAKE_ANIMATION_TIME) // can't be shaking
-            return InteractionResult.PASS;
+        if (cannotInteract() || ticksSinceLastInteraction <= SHAKE_ANIMATION_TIME) return InteractionResult.PASS;
 
         ticksSinceLastInteraction = 0;
         if (++progress >= REQUIRED_SHAKES) {
             progress = 0;
             finish(pPlayer);
         } else {
-            level.playSound(pPlayer, getBlockPos(), SSSounds.SWORD_PULL.get(), SoundSource.BLOCKS, Mth.clamp(progress - 2, 0, 10) * 0.1F, Math.max(progress * 0.04F, 1.3F));
+            level.playSound(pPlayer, getBlockPos(), SSSounds.SWORD_PULL.get(), SoundSource.BLOCKS, Mth.clamp(progress - 2, 0, 10) * 0.1F, Math.max(progress * 0.03F, 1.1F));
         }
         level.playSound(pPlayer, getBlockPos(), SSSounds.ROCK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 
@@ -141,19 +141,33 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
             entity.progress = 0;
         }
 
-        if (entity.isIdle()) {
-            entity.idleTicks++;
-            if (entity.idleTicks == 75 && !level.isClientSide) {
-                SSNetworking.sendToClientsLoadingBE(new ClientboundSyncSwordStoneDataPacket(blockPos, false, (short) 75), entity);
+        if (SSConfig.SWORD_BEACON_ENABLED.get()) {
+            if (entity.isIdle()) {
+                entity.idleTicks++;
 
-                level.playSound(null, entity.getBlockPos(), SSSounds.LASER.get(), SoundSource.BLOCKS, 4.5F, 0.6F + level.random.nextFloat() * 0.8F);
-            }
-            if (entity.idleTicks >= BEACON_ANIMATION_CYCLE) {
+                if (!level.isClientSide) {
+                    if (entity.idleTicks >= BEACON_ANIMATION_CYCLE) {
+                        entity.idleTicks = 0;
+
+                        SSNetworking.sendToClientsLoadingBE(new ClientboundSyncSwordStoneDataPacket(blockPos, false, (short) 0), entity);
+                    }
+                } else if (entity.idleTicks == 75) {
+                    level.playLocalSound(entity.getBlockPos(), SSSounds.LASER.get(), SoundSource.BLOCKS, 4.5F, 0.6F + level.random.nextFloat() * 0.8F, false);
+                }
+            } else {
                 entity.idleTicks = 0;
             }
-        } else {
-            entity.idleTicks = 0;
         }
+    }
+
+    public boolean cannotInteract() {
+        return !hasSword || (idleTicks > 0 && idleTicks < SwordStoneMasterBlockEntity.BEACON_ANIMATION_TIME);
+    }
+
+    @Override
+    @Nullable
+    public SwordStoneMasterBlockEntity getMaster() {
+        return this;
     }
 
     private ParticleOptions getShakeParticle() {
@@ -190,7 +204,7 @@ public class SwordStoneMasterBlockEntity extends BlockEntity implements ISwordSt
 
     public float[] getBeamColor() {
         if (stack.getItem() instanceof UniqueSwordItem uniqueSwordItem) {
-            Color color = UniqueSwordItem.STYLE_TABLE.get(uniqueSwordItem, AbilityUtil.getSwordAbility(stack));
+            Color color = UniqueSwordItem.COLOR_TABLE.get(uniqueSwordItem, AbilityUtil.getSwordAbility(stack));
             if (color != null) return color.getDiffusedColor();
         }
         return AbilityUtil.getSwordAbility(stack).getDiffusedColor();

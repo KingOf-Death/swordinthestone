@@ -1,7 +1,6 @@
 package com.bonker.swordinthestone.common.networking;
 
-import com.bonker.swordinthestone.SwordInTheStone;
-import net.minecraft.resources.ResourceLocation;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,7 +19,7 @@ public class SSNetworking {
 
     public static void register() {
         INSTANCE = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(SwordInTheStone.MODID, "packets"))
+                .named(Util.makeResource("packets"))
                 .networkProtocolVersion(() -> "1.0")
                 .clientAcceptedVersions(s -> true)
                 .serverAcceptedVersions(s -> true)

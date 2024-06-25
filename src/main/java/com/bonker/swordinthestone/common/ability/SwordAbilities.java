@@ -3,31 +3,34 @@ package com.bonker.swordinthestone.common.ability;
 import com.bonker.swordinthestone.SwordInTheStone;
 import com.bonker.swordinthestone.client.particle.SSParticles;
 import com.bonker.swordinthestone.common.SSAttributes;
+import com.bonker.swordinthestone.common.SSConfig;
 import com.bonker.swordinthestone.common.SSSounds;
-import com.bonker.swordinthestone.common.capability.DashCapability;
 import com.bonker.swordinthestone.common.entity.BatSwarmGoal;
 import com.bonker.swordinthestone.common.entity.EnderRift;
 import com.bonker.swordinthestone.common.entity.SpellFireball;
 import com.bonker.swordinthestone.common.networking.ClientboundSyncDeltaPacket;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
+import com.bonker.swordinthestone.server.capability.DashCapability;
 import com.bonker.swordinthestone.util.AbilityUtil;
+import com.bonker.swordinthestone.util.SideUtil;
 import com.bonker.swordinthestone.util.Util;
 import com.google.common.collect.ImmutableMultimap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ambient.Bat;
@@ -36,32 +39,39 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 public class SwordAbilities {
-    public static final DeferredRegister<SwordAbility> SWORD_ABILITIES = DeferredRegister.create(new ResourceLocation(SwordInTheStone.MODID, "sword_abilities"), SwordInTheStone.MODID);
+    public static final DeferredRegister<SwordAbility> SWORD_ABILITIES = DeferredRegister.create(Util.makeResource("sword_abilities"), SwordInTheStone.MODID);
     public static final Supplier<IForgeRegistry<SwordAbility>> SWORD_ABILITY_REGISTRY = SWORD_ABILITIES.makeRegistry(RegistryBuilder::new);
 
     // Thunder Smite
     public static final RegistryObject<SwordAbility> THUNDER_SMITE = register("thunder_smite",
             () -> new SwordAbilityBuilder(0x57faf6)
                     .onHit((level, holder, victim) -> {
+                        if (holder instanceof Player player && player.getAttackStrengthScale(0) < 0.75F) {
+                            return;
+                        }
+
                         ItemStack stack = holder.getItemInHand(InteractionHand.MAIN_HAND);
-                        int charge = stack.getOrCreateTag().getInt("charge");
+                        int charge = AbilityUtil.getCharge(stack);
                         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, victim.getX(), victim.getY() + 1.0, victim.getZ(), 20, 0.7, 1, 0.7, 0.4);
                         level.playSound(null, holder.getX(), holder.getY(), holder.getZ(), SSSounds.ZAP.get(), SoundSource.PLAYERS, 2.0F, 2.0F - charge * 0.5F);
-                        if (++charge > 3) {
+                        if (++charge > SSConfig.THUNDER_SMITE_CHARGES.get()) {
                             LightningBolt bolt = EntityType.LIGHTNING_BOLT.spawn(level, null, entity -> {
                                 entity.setVisualOnly(true);
                                 if (holder instanceof ServerPlayer serverPlayer) entity.setCause(serverPlayer);
@@ -70,33 +80,34 @@ public class SwordAbilities {
                                 List<Entity> list = level.getEntities(bolt, new AABB(bolt.getX() - 3.0D, bolt.getY() - 3.0D, bolt.getZ() - 3.0D, bolt.getX() + 3.0D, bolt.getY() + 6.0D + 3.0D, bolt.getZ() + 3.0D), Entity::isAlive);
                                 for (Entity entity : list) {
                                     if (entity == holder) continue;
-                                    if (!net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, bolt)) entity.thunderHit(level, bolt);
+                                    if (!ForgeEventFactory.onEntityStruckByLightning(entity, bolt)) entity.thunderHit(level, bolt);
                                 }
                             }
                             charge = 0;
                         }
-                        stack.getOrCreateTag().putInt("charge", charge);
+                        AbilityUtil.setCharge(stack, charge);
                     })
-                    .hasGlint(stack -> stack.getOrCreateTag().getInt("charge") >= 3)
+                    .customBar(stack -> false,
+                            stack -> (float) AbilityUtil.getCharge(stack) / SSConfig.THUNDER_SMITE_CHARGES.get())
                     .build());
+
     // Vampiric
     public static final RegistryObject<SwordAbility> VAMPIRIC = register("vampiric",
             () -> new SwordAbilityBuilder(0xe20028)
                     .onKill((level, holder, victim) -> {
-                        float healing = Mth.clamp(victim.getMaxHealth() * 0.2F, 1, 10);
+                        float healing = Mth.clamp(victim.getMaxHealth() * SSConfig.VAMPIRIC_HEALTH_PERCENT.get().floatValue(), 1, SSConfig.VAMPIRIC_HEALTH_CAP.get());
                         int particles = Mth.clamp(Math.round(healing * 3), 4, 20);
                         holder.heal(healing);
                         level.sendParticles(SSParticles.HEAL.get(), victim.getX(), victim.getY() + victim.getBbHeight() * 0.5, victim.getZ(), particles, victim.getBbWidth() * 0.2, victim.getBbHeight() * 0.2, victim.getBbWidth() * 0.2, 0);
                     })
                     .build());
+
     // Toxic Dash
-    public static final int TOXIC_DASH_COOLDOWN = 200;
     public static final RegistryObject<SwordAbility> TOXIC_DASH = register("toxic_dash",
             () -> new SwordAbilityBuilder(0x52c539)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-                        if (!(player.onGround() || player.isUnderWater())) return InteractionResultHolder.pass(stack);
-                        if (AbilityUtil.isOnCooldown(stack, level, TOXIC_DASH_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.TOXIC_DASH_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                         level.playSound(player, player.getX(), player.getY(), player.getZ(), SSSounds.DASH.get(), SoundSource.PLAYERS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
                         level.playSound(player, player.getX(), player.getY(), player.getZ(), SSSounds.TOXIC.get(), SoundSource.PLAYERS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
@@ -115,23 +126,18 @@ public class SwordAbilities {
                             SSNetworking.sendToPlayer(new ClientboundSyncDeltaPacket(player.getDeltaMovement()), (ServerPlayer) player);
                         }
 
-                        AbilityUtil.setOnCooldown(stack, level, TOXIC_DASH_COOLDOWN);
+                        AbilityUtil.setOnCooldown(stack, level);
                         return InteractionResultHolder.success(stack);
                     })
-                    .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, TOXIC_DASH_COOLDOWN))
-                    .customBar(AbilityUtil::showCooldownBar,
-                               stack -> AbilityUtil.cooldownProgress(stack, TOXIC_DASH_COOLDOWN),
-                               null)
+                    .addCooldown(SSConfig.TOXIC_DASH_COOLDOWN)
                     .build());
 
     // Ender Rift
-    public static final int ENDER_RIFT_DURATION = 60;
-    public static final int ENDER_RIFT_COOLDOWN = 200; // must be more than the duration
     public static final RegistryObject<SwordAbility> ENDER_RIFT = register("ender_rift",
             () -> new SwordAbilityBuilder(0xe434ff)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-                        if (AbilityUtil.isOnCooldown(stack, level, ENDER_RIFT_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.ENDER_RIFT_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                         if (!level.isClientSide) {
                             EnderRift enderRift = new EnderRift(level, player);
@@ -143,37 +149,34 @@ public class SwordAbilities {
                         return InteractionResultHolder.pass(stack);
                     })
                     .onReleaseUsing((stack, level, entity, ticks) -> {
-                        if (AbilityUtil.isOnCooldown(stack, level, ENDER_RIFT_COOLDOWN)) return;
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.ENDER_RIFT_COOLDOWN.get())) return;
 
                         if (!level.isClientSide) {
-                            if (ENDER_RIFT_DURATION - ticks > 4) {
+                            if (SSConfig.ENDER_RIFT_DURATION.get() - ticks > 4) {
                                 Util.getOwnedProjectiles(entity, EnderRift.class, (ServerLevel) level).forEach(EnderRift::teleport);
                             } else {
                                 Util.getOwnedProjectiles(entity, EnderRift.class, (ServerLevel) level).forEach(e -> e.getEntityData().set(EnderRift.DATA_CONTROLLING, false));
                             }
                         }
 
-                        AbilityUtil.setOnCooldown(stack, level, ENDER_RIFT_COOLDOWN);
+                        AbilityUtil.setOnCooldown(stack, level);
                     })
-                    .useDuration(ENDER_RIFT_DURATION)
-                    .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, ENDER_RIFT_COOLDOWN))
-                    .customBar(AbilityUtil::showCooldownBar,
-                            stack -> AbilityUtil.cooldownProgress(stack, ENDER_RIFT_COOLDOWN),
-                            null)
-                    .useAnimation(UseAnim.BLOCK)
+                    .useDuration(stack -> SSConfig.ENDER_RIFT_DURATION.get())
+                    .addCooldown(SSConfig.ENDER_RIFT_COOLDOWN)
+                    .useAnimation(stack -> UseAnim.BLOCK)
                     .build());
 
     // Fireball
-    public static final int FIREBALL_COOLDOWN = 120;
     public static final RegistryObject<SwordAbility> FIREBALL = register("fireball",
             () -> new SwordAbilityBuilder(0xff4b25)
                     .onUse((level, player, usedHand) -> {
                         ItemStack stack = player.getItemInHand(usedHand);
-                        if (AbilityUtil.isOnCooldown(stack, level, FIREBALL_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                        if (AbilityUtil.isOnCooldown(stack, level, SSConfig.FIREBALL_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                         if (!level.isClientSide) {
                             SpellFireball fireball = new SpellFireball(level, player);
                             fireball.setPower(0.1F);
+                            fireball.setPos(player.getEyePosition().add(player.getLookAngle().scale(1.5)));
                             level.addFreshEntity(fireball);
                         }
 
@@ -183,14 +186,11 @@ public class SwordAbilities {
                         if (!level.isClientSide) {
                             Util.getOwnedProjectiles(entity, SpellFireball.class, (ServerLevel) level).forEach(e -> e.getEntityData().set(SpellFireball.DATA_SHOT, true));
                         }
-                        AbilityUtil.setOnCooldown(stack, level, FIREBALL_COOLDOWN);
+                        AbilityUtil.setOnCooldown(stack, level);
                     })
-                    .useDuration(72000)
-                    .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, FIREBALL_COOLDOWN))
-                    .customBar(AbilityUtil::showCooldownBar,
-                            stack -> AbilityUtil.cooldownProgress(stack, FIREBALL_COOLDOWN),
-                            null)
-                    .useAnimation(UseAnim.BOW)
+                    .useDuration(stack -> 72000)
+                    .addCooldown(SSConfig.FIREBALL_COOLDOWN)
+                    .useAnimation(stack -> UseAnim.BOW)
                     .build());
 
     // Double Jump
@@ -204,49 +204,95 @@ public class SwordAbilities {
                     .build());
 
     // Alchemist
-    public static final List<Potion> POSITIVE_EFFECTS = List.of(Potions.FIRE_RESISTANCE, Potions.LEAPING, Potions.REGENERATION, Potions.WATER_BREATHING,
-            Potions.NIGHT_VISION, Potions.SWIFTNESS, Potions.STRENGTH, Potions.STRONG_SWIFTNESS, Potions.STRONG_LEAPING, Potions.STRONG_REGENERATION, Potions.STRONG_STRENGTH);
-    public static final List<Potion> NEGATIVE_EFFECTS = List.of(Potions.POISON, Potions.SLOWNESS, Potions.WEAKNESS, Potions.STRONG_POISON, Potions.STRONG_SLOWNESS);
+    public static final TagKey<Potion> ALCHEMIST_SELF_EFFECTS = Util.makeTag(Registries.POTION, "alchemist_self");
+    public static final TagKey<Potion> ALCHEMIST_VICTIM_EFFECTS = Util.makeTag(Registries.POTION, "alchemist_victim");
     public static final RegistryObject<SwordAbility> ALCHEMIST = register("alchemist",
             () -> new SwordAbilityBuilder(0xffbf47)
             .onHit((level, attacker, victim) -> {
-                if (victim.isDeadOrDying()) return;
-                if (attacker instanceof Player player && player.getAttackStrengthScale(0F) < 1.0) return;
-
-                if (level.random.nextFloat() > 0.5F) {
-                    Potion potion = Util.randomListItem(NEGATIVE_EFFECTS, level.random);
-                    MobEffectInstance effectInst = Util.copyWithDuration(potion.getEffects().get(0), 300);
-                    victim.addEffect(effectInst);
-
-                    if (attacker instanceof ServerPlayer player) {
-                        AbilityUtil.sendAlchemistMsg(player, effectInst, false);
-                    }
-
-                    level.levelEvent(LevelEvent.PARTICLES_SPELL_POTION_SPLASH, BlockPos.containing(victim.position()), PotionUtils.getColor(potion));
+                if (!level.isClientSide && !victim.isDeadOrDying() &&
+                        !(attacker instanceof Player player && player.getAttackStrengthScale(0F) < 1.0)) {
+                    handleAlchemistAbility(level, attacker, victim);
                 }
             })
             .onKill((level, attacker, victim) -> {
-                if (level.random.nextFloat() > 0.5) {
-                    Potion potion = Util.randomListItem(POSITIVE_EFFECTS, level.random);
-                    MobEffectInstance effectInst = Util.copyWithDuration(potion.getEffects().get(0), 300);
-                    attacker.addEffect(effectInst);
-
-                    if (attacker instanceof ServerPlayer player) {
-                        AbilityUtil.sendAlchemistMsg(player, effectInst, true);
-                    }
-
-                    level.levelEvent(LevelEvent.PARTICLES_SPELL_POTION_SPLASH, BlockPos.containing(attacker.position()), PotionUtils.getColor(potion));
+                if (!level.isClientSide) {
+                    handleAlchemistAbility(level, attacker, null);
                 }
             })
             .build());
 
+    public static void handleAlchemistAbility(Level level, LivingEntity attacker, @Nullable LivingEntity victim) {
+        float chance = (victim == null ? SSConfig.ALCHEMIST_SELF_CHANCE : SSConfig.ALCHEMIST_VICTIM_CHANCE).get().floatValue();
+        if (level.random.nextFloat() <= chance) {
+            for (int tries = 0; tries < 3; tries++) {
+                Optional<Holder<Potion>> optional = level.registryAccess().registryOrThrow(Registries.POTION)
+                        .getOrCreateTag(victim == null ? ALCHEMIST_SELF_EFFECTS : ALCHEMIST_VICTIM_EFFECTS)
+                        .getRandomElement(level.random);
+
+                if (optional.isPresent()) {
+                    Potion potion = optional.get().get();
+                    boolean splashed = false;
+                    List<MobEffectInstance> effects = Util.copyWithDuration(potion.getEffects(), duration -> duration / 4);
+
+                    for (MobEffectInstance effect : effects) {
+                        LivingEntity target = victim == null ? attacker : victim;
+                        if (!target.canBeAffected(effect)) {
+                            continue;
+                        }
+                        target.addEffect(effect);
+
+                        if (!splashed) {
+                            splashed = true;
+
+                            level.levelEvent(
+                                    LevelEvent.PARTICLES_SPELL_POTION_SPLASH,
+                                    (victim == null ? attacker : victim).blockPosition(),
+                                    PotionUtils.getColor(potion)
+                            );
+                        }
+
+                        if (attacker instanceof ServerPlayer serverPlayer) {
+                            serverPlayer.sendSystemMessage(
+                                    Component.translatable(
+                                            "ability.swordinthestone.alchemist." + (victim == null ? "self" : "victim"),
+                                            getPotionMessage(effect)
+                                    ).withStyle(ALCHEMIST.get().getColorStyle()),
+                                    effects.size() == 1
+                            );
+                        }
+                    }
+
+                    if (splashed) return;
+                }
+            }
+        }
+    }
+
+    private static MutableComponent getPotionMessage(MobEffectInstance effect) {
+        Component potionName = Component.translatable(effect.getDescriptionId());
+        int duration = effect.getDuration() / 20;
+
+        MutableComponent potionMessage;
+        if (effect.getAmplifier() > 0) {
+            potionMessage = Component.translatable("ability.swordinthestone.alchemist.potionAmplifier",
+                    potionName,
+                    Component.translatable("potion.potency." + effect.getAmplifier()),
+                    duration);
+        } else {
+            potionMessage = Component.translatable("ability.swordinthestone.alchemist.potion",
+                    potionName,
+                    duration);
+        }
+
+        return potionMessage.withStyle(Style.EMPTY.withColor(effect.getEffect().getColor()));
+    }
+
     // Bat Swarm
-    public static final int BAT_SWARM_COOLDOWN = 200;
     public static final RegistryObject<SwordAbility> BAT_SWARM = register("bat_swarm",
             () -> new SwordAbilityBuilder(0xab29ff)
             .onUse((level, player, usedHand) -> {
                 ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                if (AbilityUtil.isOnCooldown(stack, level, BAT_SWARM_COOLDOWN)) return InteractionResultHolder.fail(stack);
+                if (AbilityUtil.isOnCooldown(stack, level, SSConfig.BAT_SWARM_COOLDOWN.get())) return InteractionResultHolder.fail(stack);
 
                 if (!level.isClientSide) {
                     Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(0.9));
@@ -263,18 +309,117 @@ public class SwordAbilities {
                 }
 
                 player.swing(InteractionHand.MAIN_HAND);
-                AbilityUtil.setOnCooldown(stack, level, BAT_SWARM_COOLDOWN);
+                AbilityUtil.setOnCooldown(stack, level);
                 return InteractionResultHolder.success(stack);
             })
-            .inventoryTick((stack, level, entity, slotId, isSelected) -> AbilityUtil.updateCooldown(stack, level, BAT_SWARM_COOLDOWN))
-            .customBar(AbilityUtil::showCooldownBar,
-                    stack -> AbilityUtil.cooldownProgress(stack, BAT_SWARM_COOLDOWN),
-                    null)
+            .addCooldown(SSConfig.BAT_SWARM_COOLDOWN)
             .build());
 
+    public static final RegistryObject<SwordAbility> VORTEX_CHARGE = register("vortex_charge",
+            () -> new SwordAbilityBuilder(0x00ffb9)
+                    .onUse((level, player, usedHand) -> {
+                        ItemStack stack = player.getItemInHand(usedHand);
+                        int charge = AbilityUtil.getCharge(stack);
+                        if (player.isCrouching()) {
+                            if (level.isClientSide) {
+                                SideUtil.releaseRightClick();
+                            }
+
+                            if (charge > 0) {
+                                AbilityUtil.setCharge(stack, 0);
+
+                                player.swing(usedHand);
+
+                                if (level.isClientSide) {
+                                    for (int i = 0; i < 20 + (charge / SSConfig.VORTEX_CHARGE_CAPACITY.get()) * 40; i++) {
+                                        Vec3 pos = player.getEyePosition().add((level.random.nextFloat() - 0.5) * 0.5, (level.random.nextFloat() - 0.5) * 0.5, (level.random.nextFloat() - 0.5) * 0.5);
+                                        Vec3 delta = player.getEyePosition().subtract(pos).normalize();
+                                        level.addParticle(SSParticles.VORTEX.get(), pos.x(), pos.y(), pos.z(), delta.x(), delta.y(), delta.z());
+                                    }
+                                } else {
+                                    level.playSound(null, player.blockPosition(), SSSounds.VORTEX.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+
+                                    double percentCharge = charge / (float) SSConfig.VORTEX_CHARGE_CAPACITY.get();
+                                    double range = 5 + percentCharge * 15;
+                                    for (Entity entity : level.getEntities(player, AABB.ofSize(player.getEyePosition(), range, range, range))) {
+                                        double percentDistance = (10 - entity.distanceTo(player)) / 10F;
+                                        double scale = percentCharge * percentDistance;
+
+                                        entity.hurt(level.damageSources().playerAttack(player), SSConfig.VORTEX_CHARGE_DAMAGE.get().floatValue() * (float) scale);
+
+                                        Vec3 delta = entity.position()
+                                                .subtract(player.position())
+                                                .normalize()
+                                                .add(0, scale * 0.2, 0)
+                                                .scale(scale * 5);
+                                        entity.push(delta.x(), delta.y(), delta.z());
+                                        entity.resetFallDistance();
+                                    }
+                                }
+
+                                return InteractionResultHolder.success(stack);
+                            }
+                        } else if (charge > 0) {
+                            level.playSound(null, player.blockPosition(), SSSounds.SUCTION.get(), SoundSource.PLAYERS, 1.0F, 1.4F);
+                        }
+                        return InteractionResultHolder.pass(stack);
+                    })
+                    .onUseTick((level, user, stack, remainingUseDuration) -> {
+                        int charge = AbilityUtil.getCharge(stack);
+                        if (charge > 0) {
+                            AbilityUtil.setCharge(stack, charge - 1);
+                            for (Entity entity : level.getEntities(user, AABB.ofSize(user.position(), 20, 20, 20), e -> e.getBoundingBox().getSize() < 2.5)) {
+                                if (!level.isClientSide) {
+                                    double percentDistance = (15 - entity.distanceTo(user)) / 15F;
+                                    entity.setDeltaMovement(user.position()
+                                            .subtract(entity.getX(), entity.getY() - 0.5, entity.getZ())
+                                            .normalize()
+                                            .multiply(percentDistance * 0.4, percentDistance * 0.4, percentDistance * 0.4));
+                                    entity.hurtMarked = true;
+                                    entity.resetFallDistance();
+                                }
+                            }
+
+                            if (!level.isClientSide && remainingUseDuration % 18 == 0) {
+                                level.playSound(null, user.blockPosition(), SSSounds.SUCTION.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                            }
+
+                            if (level.isClientSide) {
+                                for (int i = 0; i < 4; i++) {
+                                    Vec3 pos = user.position().add((level.random.nextFloat() - 0.5) * 15, (level.random.nextFloat() - 0.5) * 0.2, (level.random.nextFloat() - 0.5) * 15);
+                                    Vec3 delta = user.position().subtract(pos).normalize().scale(0.2);
+                                    level.addParticle(SSParticles.VORTEX.get(), pos.x(), pos.y() + 0.5, pos.z(), delta.x(), delta.y(), delta.z());
+                                }
+                            }
+                        }
+                    })
+                    .onHit((level, attacker, victim) -> {
+                        float percent = 1;
+                        if (attacker instanceof Player player) {
+                            float scale = player.getAttackStrengthScale(0);
+                            if (scale < 0.75F) {
+                                return;
+                            }
+                            percent = scale * scale;
+                        }
+
+                        ItemStack stack = attacker.getItemInHand(InteractionHand.MAIN_HAND);
+                        int charge = AbilityUtil.getCharge(stack);
+                        if (charge < SSConfig.VORTEX_CHARGE_CAPACITY.get()) {
+                            level.sendParticles(SSParticles.VORTEX.get(), victim.getX(), victim.getY() + 0.5, victim.getZ(), Mth.ceil(percent * 12), 0.4, 0.1, 0.4, 0.2);
+
+                            level.playSound(null, victim.blockPosition(), SSSounds.WHOOSH.get(), SoundSource.PLAYERS, 1.0F, 0.6F + level.random.nextFloat() * 0.8F);
+
+                            AbilityUtil.setCharge(stack, Math.min(SSConfig.VORTEX_CHARGE_CAPACITY.get(), charge + Mth.floor(percent * SSConfig.VORTEX_CHARGE_PER_HIT.get())));
+                        }
+                    })
+                    .customBar(stack -> false, stack -> (float) AbilityUtil.getCharge(stack) / SSConfig.VORTEX_CHARGE_CAPACITY.get())
+                    .useDuration(AbilityUtil::getCharge)
+                    .useAnimation(stack -> UseAnim.BOW)
+                    .build());
 
     private static RegistryObject<SwordAbility> register(String name, Supplier<SwordAbility> supplier) {
-        SwordInTheStone.ABILITY_MODEL_MAP.put(SwordInTheStone.MODID + ":" + name, new ResourceLocation(SwordInTheStone.MODID, "item/ability/" + name));
+        SwordInTheStone.ABILITY_MODEL_MAP.put(SwordInTheStone.MODID + ":" + name, Util.makeResource("item/ability/" + name));
         return SWORD_ABILITIES.register(name, supplier);
     }
 }

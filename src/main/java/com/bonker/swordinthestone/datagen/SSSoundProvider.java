@@ -1,6 +1,6 @@
 package com.bonker.swordinthestone.datagen;
 
-import com.bonker.swordinthestone.SwordInTheStone;
+import com.bonker.swordinthestone.util.Util;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -30,12 +30,15 @@ public class SSSoundProvider extends SoundDefinitionsProvider {
         createSingleSound("rift", "Ender rift created", "rift");
         createSingleSound("jump", "Player double jumps", "jump");
         createSingleSound("land", "Player lands softly", "land");
+        createSingleSound("suction", "Vortex suction", "suction");
+        createSingleSound("vortex", "Powerful vortex blast", "vortex");
+        createSingleSound("whoosh", "Vortex energy released", "whoosh");
     }
 
     private void createMultiSound(String name, String subtitle, String... sounds) {
         SoundDefinition definition = SoundDefinition.definition();
         for (String sound : sounds) {
-            definition.with(SoundDefinition.Sound.sound(new ResourceLocation(SwordInTheStone.MODID, sound), SoundDefinition.SoundType.SOUND));
+            definition.with(SoundDefinition.Sound.sound(Util.makeResource(sound), SoundDefinition.SoundType.SOUND));
         }
         String langKey = "subtitles.swordinthestone." + name;
         add(name, definition.subtitle(langKey));
@@ -44,14 +47,14 @@ public class SSSoundProvider extends SoundDefinitionsProvider {
 
     private void createSingleSound(String name, String subtitle, String sound) {
         SoundDefinition definition = SoundDefinition.definition();
-        definition.with(SoundDefinition.Sound.sound(new ResourceLocation(SwordInTheStone.MODID, sound), SoundDefinition.SoundType.SOUND));
+        definition.with(SoundDefinition.Sound.sound(Util.makeResource(sound), SoundDefinition.SoundType.SOUND));
         String langKey = "subtitles.swordinthestone." + name;
         add(name, definition.subtitle(langKey));
         languageProvider.add(langKey, subtitle);
     }
 
     private void createNoSubtitleSingleSound(String name) {
-        ResourceLocation loc = new ResourceLocation(SwordInTheStone.MODID, name);
+        ResourceLocation loc = Util.makeResource(name);
         add(loc, SoundDefinition.definition().with(sound(loc)));
     }
 }

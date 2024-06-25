@@ -6,7 +6,7 @@ plugins {
 
 
 group = 'com.bonker'
-version = '1.1'
+version = '2.0'
 
 java {
     archivesBaseName = 'swordinthestone'
@@ -152,7 +152,7 @@ jar {
         attributes([
                 "Specification-Title"     : "swordinthestone",
                 //"Specification-Vendor": "swordinthestone authors",
-                "Specification-Version"   : "1.1", // We are version 1 of ourselves
+                "Specification-Version"   : "2.0", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.version,
                 //"Implementation-Vendor": "swordinthestone authors",

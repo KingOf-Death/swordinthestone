@@ -17,14 +17,17 @@
       "weight": 1
     },
     {
+      "structure": "swordinthestone:sword_stone_taiga",
+      "weight": 1
+    },
+    {
       "structure": "swordinthestone:sword_stone_red_desert",
       "weight": 1
     }
   ],
   "placement": {
-    "type": "minecraft:random_spread",
-    "spacing": 40,
-    "separation": 15,
+    "type": "swordinthestone:sword_stone_placement",
+    "sword_stone_type": "overworld",
     "salt": 1446207470
   }
 }

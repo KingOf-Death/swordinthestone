@@ -6,6 +6,7 @@ import com.bonker.swordinthestone.common.ability.SwordAbilities;
 import com.bonker.swordinthestone.common.ability.SwordAbility;
 import com.bonker.swordinthestone.util.AbilityUtil;
 import com.bonker.swordinthestone.util.Color;
+import com.bonker.swordinthestone.util.Util;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -39,10 +40,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class UniqueSwordItem extends SwordItem {
-    public static final Tier TIER = new ForgeTier(0, 0, 0, 0, 10, BlockTags.MINEABLE_WITH_PICKAXE, () -> Ingredient.EMPTY);
-    public static final HashBasedTable<UniqueSwordItem, SwordAbility, Color> STYLE_TABLE = HashBasedTable.create();
-    private static final int BASE_DAMAGE = 7;
-    private static final float BASE_SPEED = 1.2F - 4F;
+    public static final Tier TIER = new ForgeTier(0, SSConfig.DURABILITY.get(), 0, 0, 10, BlockTags.MINEABLE_WITH_PICKAXE, () -> Ingredient.EMPTY);
+    public static final HashBasedTable<UniqueSwordItem, SwordAbility, Color> COLOR_TABLE = HashBasedTable.create();
     public static final String DAMAGE_TAG = "damage";
     public static final String SPEED_TAG = "speed";
 
@@ -52,7 +51,7 @@ public class UniqueSwordItem extends SwordItem {
     private final int color;
 
     public UniqueSwordItem(int color, Properties pProperties) {
-        super(TIER, BASE_DAMAGE, BASE_SPEED, pProperties);
+        super(TIER, SSConfig.BASE_DAMAGE.get() - 1, SSConfig.BASE_SPEED.get().floatValue() - 4, pProperties);
         this.color = color;
     }
 
@@ -61,8 +60,9 @@ public class UniqueSwordItem extends SwordItem {
     }
 
     public static ItemStack getRandom(String type, RandomSource random) {
-        if (swords == null)
+        if (swords == null) {
             swords = SSItems.ITEMS.getEntries().stream().filter(item -> item.get() instanceof UniqueSwordItem).map(item -> (UniqueSwordItem) item.get()).toList();
+        }
         if (abilities == null) {
             reloadAbilities();
         }
@@ -79,8 +79,8 @@ public class UniqueSwordItem extends SwordItem {
 
         ItemStack stack = new ItemStack(item);
         AbilityUtil.setSwordAbility(stack, ability);
-        stack.getOrCreateTag().putFloat(UniqueSwordItem.DAMAGE_TAG, 7 + 0.5F * random.nextInt(7));
-        stack.getOrCreateTag().putFloat(UniqueSwordItem.SPEED_TAG, 1.2F + 0.1F * random.nextInt(6));
+        stack.getOrCreateTag().putFloat(UniqueSwordItem.DAMAGE_TAG, SSConfig.BASE_DAMAGE.get() - 1 + Util.randomFloatMultiple(random, SSConfig.MAX_DAMAGE_MODIFIER.get().floatValue(), 0.5F));
+        stack.getOrCreateTag().putFloat(UniqueSwordItem.SPEED_TAG, SSConfig.BASE_SPEED.get().floatValue() + Util.randomFloatMultiple(random, SSConfig.MAX_SPEED_MODIFIER.get().floatValue(), 0.1F));
         return stack;
     }
 
@@ -97,8 +97,8 @@ public class UniqueSwordItem extends SwordItem {
         float damage = stack.getOrCreateTag().getFloat(DAMAGE_TAG);
         float speed = stack.getOrCreateTag().getFloat(SPEED_TAG);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.<Attribute, AttributeModifier>builder()
-                .put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "swordinthestone.attack_damage", damage > 0 ? damage : BASE_DAMAGE, AttributeModifier.Operation.ADDITION))
-                .put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "swordinthestone.attack_speed", speed > 0 ? speed - 4F : BASE_SPEED, AttributeModifier.Operation.ADDITION));
+                .put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "swordinthestone.attack_damage", damage > 0 ? damage : SSConfig.BASE_DAMAGE.get() - 1, AttributeModifier.Operation.ADDITION))
+                .put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "swordinthestone.attack_speed", speed > 0 ? speed - 4F : SSConfig.BASE_SPEED.get(), AttributeModifier.Operation.ADDITION));
         AbilityUtil.getSwordAbility(stack).addAttributes(builder);
         return builder.build();
     }
@@ -112,6 +112,11 @@ public class UniqueSwordItem extends SwordItem {
                 ability.kill(serverLevel, pAttacker, pTarget);
             }
         }
+
+        if (getTier().getUses() > 0) {
+            return super.hurtEnemy(pStack, pTarget, pAttacker);
+        }
+
         return true;
     }
 
@@ -130,26 +135,8 @@ public class UniqueSwordItem extends SwordItem {
     }
 
     @Override
-    public boolean isFoil(ItemStack pStack) {
-        return super.isFoil(pStack) || AbilityUtil.getSwordAbility(pStack).hasGlint(pStack);
-    }
-
-    @Override
-    public boolean isBarVisible(ItemStack pStack) {
-        SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
-        return ability.isBarVisible(pStack);
-    }
-
-    @Override
-    public int getBarWidth(ItemStack pStack) {
-        SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
-        return ability.getBarWidth(pStack);
-    }
-
-    @Override
-    public int getBarColor(ItemStack pStack) {
-        SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
-        return ability.getBarColor(pStack);
+    public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration) {
+        AbilityUtil.getSwordAbility(pStack).useTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
     }
 
     @Override
@@ -164,12 +151,12 @@ public class UniqueSwordItem extends SwordItem {
 
     @Override
     public int getUseDuration(ItemStack pStack) {
-        return AbilityUtil.getSwordAbility(pStack).getUseDuration();
+        return AbilityUtil.getSwordAbility(pStack).getUseDuration(pStack);
     }
 
     @Override
     public UseAnim getUseAnimation(ItemStack pStack) {
-        return AbilityUtil.getSwordAbility(pStack).getUseAnimation();
+        return AbilityUtil.getSwordAbility(pStack).getUseAnimation(pStack);
     }
 
     @Override
@@ -181,7 +168,7 @@ public class UniqueSwordItem extends SwordItem {
     public Component getName(ItemStack pStack) {
         SwordAbility ability = AbilityUtil.getSwordAbility(pStack);
         if (ability == SwordAbility.NONE) return super.getName(pStack);
-        Color color = STYLE_TABLE.get(this, ability);
+        Color color = COLOR_TABLE.get(this, ability);
         return Component.translatable(ability.getTitleKey(), super.getName(pStack)).withStyle(color == null ? Style.EMPTY : color.getStyle());
     }
 
@@ -191,6 +178,9 @@ public class UniqueSwordItem extends SwordItem {
         if (ability != SwordAbility.NONE) {
             pTooltipComponents.add(Component.literal("★ ").append(Component.translatable(ability.getNameKey())).withStyle(ability.getColorStyle()));
             pTooltipComponents.add(Component.translatable(ability.getDescriptionKey()).withStyle(ChatFormatting.GRAY));
+            if (pStack.isEnchanted()) {
+                pTooltipComponents.add(Component.empty());
+            }
         }
     }
 

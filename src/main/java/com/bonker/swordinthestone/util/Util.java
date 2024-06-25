@@ -1,12 +1,18 @@
 package com.bonker.swordinthestone.util;
 
+import com.bonker.swordinthestone.SwordInTheStone;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -61,20 +67,8 @@ public class Util {
         return new Vec3(f3 * f4, -f5, f2 * f4);
     }
 
-    /** make sure the list isn't empty */
-    public static <T> T randomListItem(List<T> list, RandomSource random) {
-        return list.get(random.nextInt(list.size()));
-    }
-
-    public static MobEffectInstance copyWithDuration(MobEffectInstance effect, int duration) {
-        return new MobEffectInstance(effect.getEffect(), duration, effect.getAmplifier(), effect.isAmbient(), effect.isVisible(), effect.showIcon());
-    }
-
-    public static float[] diffuseColor(int rgb) {
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = rgb & 0xFF;
-        return new float[] {r / 255F, g / 255F, b / 255F};
+    public static List<MobEffectInstance> copyWithDuration(List<MobEffectInstance> effects, Int2IntFunction durationMapper) {
+        return effects.stream().map(effect -> new MobEffectInstance(effect.getEffect(), effect.mapDuration(durationMapper), effect.getAmplifier())).toList();
     }
 
     public static List<BlockPos> betweenClosed(BlockPos firstPos, BlockPos secondPos) {
@@ -91,6 +85,29 @@ public class Util {
                 .map(entity -> (T) entity)
                 .filter(e -> e.getOwner() == owner)
                 .collect(Collectors.toList());
+    }
+    
+    public static ResourceLocation makeResource(String path) {
+        return new ResourceLocation(SwordInTheStone.MODID, path);
+    }
+    
+    public static <T> TagKey<T> makeTag(ResourceKey<Registry<T>> registryKey, String path) {
+        return TagKey.create(registryKey, Util.makeResource(path));
+    }
+
+    public static float randomFloatMultiple(RandomSource random, float max, float base) {
+        if (max % base > 0.001) {
+            return random.nextFloat() * max;
+        }
+
+        int intervals = Mth.floor(max / base);
+        return base * random.nextInt(intervals + 1);
+    }
+
+    public static float constrictToMultiple(float value, float base) {
+        float floor = Mth.floor(value / base) * base;
+        float ceil = floor + base;
+        return value - floor > value - ceil ? floor : ceil;
     }
 
     public static class SwordSpinAnimation {

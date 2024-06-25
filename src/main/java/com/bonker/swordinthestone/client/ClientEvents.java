@@ -1,31 +1,29 @@
 package com.bonker.swordinthestone.client;
 
 import com.bonker.swordinthestone.SwordInTheStone;
-import com.bonker.swordinthestone.client.particle.AirParticle;
-import com.bonker.swordinthestone.client.particle.FireParticle;
-import com.bonker.swordinthestone.client.particle.HealParticle;
-import com.bonker.swordinthestone.client.particle.SSParticles;
+import com.bonker.swordinthestone.client.gui.SSGuiOverlay;
+import com.bonker.swordinthestone.client.particle.*;
 import com.bonker.swordinthestone.client.renderer.SSBEWLR;
 import com.bonker.swordinthestone.client.renderer.SwordStoneBlockEntityRenderer;
 import com.bonker.swordinthestone.client.renderer.entity.EnderRiftRenderer;
 import com.bonker.swordinthestone.client.renderer.entity.SpellFireballRenderer;
 import com.bonker.swordinthestone.common.ability.SwordAbilities;
+import com.bonker.swordinthestone.common.ability.SwordAbility;
 import com.bonker.swordinthestone.common.block.entity.SSBlockEntities;
 import com.bonker.swordinthestone.common.entity.SSEntityTypes;
 import com.bonker.swordinthestone.common.item.SSItems;
 import com.bonker.swordinthestone.common.item.UniqueSwordItem;
 import com.bonker.swordinthestone.common.networking.SSNetworking;
 import com.bonker.swordinthestone.common.networking.ServerboundExtraJumpPacket;
+import com.bonker.swordinthestone.util.AbilityUtil;
+import com.bonker.swordinthestone.util.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -38,6 +36,19 @@ public class ClientEvents {
 
     @Mod.EventBusSubscriber(modid = SwordInTheStone.MODID, value = Dist.CLIENT)
     public static class ForgeBus {
+        @SubscribeEvent
+        public static void onTooltipColors(final RenderTooltipEvent.Color event) {
+            if (event.getItemStack().getItem() instanceof UniqueSwordItem uniqueSwordItem) {
+                SwordAbility ability = AbilityUtil.getSwordAbility(event.getItemStack());
+                if (ability == SwordAbility.NONE) return;
+
+                Color color = UniqueSwordItem.COLOR_TABLE.get(uniqueSwordItem, ability);
+                if (color == null) return;
+
+                color.applyTooltipColors(event);
+            }
+        }
+
         @SubscribeEvent
         public static void onKeyInput(final InputEvent.Key event) {
             LocalPlayer player = Minecraft.getInstance().player;
@@ -85,6 +96,12 @@ public class ClientEvents {
             event.registerSpriteSet(SSParticles.HEAL.get(), HealParticle.Provider::new);
             event.registerSpriteSet(SSParticles.FIRE.get(), FireParticle.Provider::new);
             event.registerSpriteSet(SSParticles.AIR.get(), AirParticle.Provider::new);
+            event.registerSpriteSet(SSParticles.VORTEX.get(), VortexParticle.Provider::new);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterGuiOverlays(final RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll(SSGuiOverlay.NAME, SSGuiOverlay.OVERLAY);
         }
     }
 }

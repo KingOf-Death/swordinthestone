@@ -15,5 +15,5 @@ public class SSParticles {
     public static final RegistryObject<SimpleParticleType> HEAL = PARTICLE_TYPES.register("heal", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> FIRE = PARTICLE_TYPES.register("fire", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> AIR = PARTICLE_TYPES.register("air", () -> new SimpleParticleType(false));
-
+    public static final RegistryObject<SimpleParticleType> VORTEX = PARTICLE_TYPES.register("vortex", () -> new SimpleParticleType(false));
 }

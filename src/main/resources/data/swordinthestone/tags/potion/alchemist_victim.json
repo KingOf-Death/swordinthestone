@@ -1,0 +1,9 @@
+{
+  "values": [
+    "poison",
+    "strong_poison",
+    "slowness",
+    "strong_slowness",
+    "weakness"
+  ]
+}
