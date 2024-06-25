@@ -36,6 +36,8 @@ public class AbilityUtil {
     }
 
     public static boolean isOnCooldown(ItemStack stack, @Nullable Level level, int cooldownLength) {
+        if (!stack.getOrCreateTag().contains("lastUsedTick")) return false;
+
         long lastUsedTick = stack.getOrCreateTag().getInt("lastUsedTick");
 
         long time;
@@ -53,6 +55,8 @@ public class AbilityUtil {
     }
 
     public static float cooldownProgress(ItemStack stack, Supplier<Integer> cooldownSupplier) {
+        if (!stack.getOrCreateTag().contains("lastUsedTick")) return 0;
+
         long time = SideUtil.getTimeSinceTick(stack.getOrCreateTag().getInt("lastUsedTick"));
         int cooldown = cooldownSupplier.get();
         if (time >= cooldown) return 0;
