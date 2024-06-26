@@ -2,7 +2,7 @@
 -----
 ![banner](https://cdn.modrinth.com/data/3HWZ1ync/images/f080d920dd22d882d4096e1e2fa04079b02bea97.png)
 ## About
-Sword in the Stone is a weapon mod that aims to improve exploration by adding fun and unique swords that the player can find throughout the world. **The mod is currently only available for Forge 1.20 & 1.20.1. No dependencies are required.**
+Sword in the Stone is a weapon mod that aims to improve exploration by adding fun and unique swords that the player can find throughout the world. **The mod is available for Forge 1.18.2, 1.19.2, 1.19.3, 1.19.4, & 1.20.1. No dependencies are required.**
 ## Sword Stones
 Sword stones are structures that can be found in all 3 vanilla dimensions. They each contain a unique sword which have different variants depending on the biome that they are found in. Unique swords have random attack damage and attack speed stats **as well as each having a random magic ability that is displayed as an overlay on the item textures**. Hold right click on the stone to retrieve the sword.
 
