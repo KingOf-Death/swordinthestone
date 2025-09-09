@@ -61,10 +61,14 @@ public class SSBEWLR extends BlockEntityWithoutLevelRenderer {
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBuffer(bufferSource, renderType, true, glint);
         itemRenderer.renderModelLists(model, stack, packedLight, packedOverlay, poseStack, vertexConsumer);
 
-        if (inGui) {
-            ((MultiBufferSource.BufferSource) bufferSource).endBatch();
-            Lighting.setupFor3DItems();
-        }
+if (pBuffer instanceof MultiBufferSource.BufferSource buf) {
+    // normal rendering
+} else {
+    // fallback: accept Apotheosis' GhostBufferSource
+    MultiBufferSource altBuf = (MultiBufferSource) pBuffer;
+    // render using altBuf instead
+}
+
 
         poseStack.popPose();
     }
